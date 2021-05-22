@@ -1,3 +1,0 @@
-[console_scripts]
-detectools = detectools.detectools:cli
-

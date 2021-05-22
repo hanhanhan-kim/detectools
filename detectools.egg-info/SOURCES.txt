@@ -1,8 +1,0 @@
-README.md
-setup.py
-detectools.egg-info/PKG-INFO
-detectools.egg-info/SOURCES.txt
-detectools.egg-info/dependency_links.txt
-detectools.egg-info/entry_points.txt
-detectools.egg-info/requires.txt
-detectools.egg-info/top_level.txt

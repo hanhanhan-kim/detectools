@@ -1,5 +1,0 @@
-pyyaml
-tqdm
-click
-opencv-python
-detectron2
