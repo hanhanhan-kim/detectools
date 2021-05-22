@@ -1,5 +1,5 @@
 """
-Originally modified from https://github.com/yukkyo/voc2coco
+Modified from https://github.com/yukkyo/voc2coco
 """
 
 import os
@@ -137,9 +137,8 @@ def main(config):
         raise ValueError(f"{basename(output)} must end in '.json'")
 
     label2id = get_label2id(labels_path=labels)
-
     ann_paths = get_annpaths(path_to_ann_paths=path_to_ann_paths)
-
+    
     convert_xmls_to_cocojson(annotation_paths=ann_paths,
                              label2id=label2id,
                              output_jsonpath=output,
@@ -149,5 +148,3 @@ def main(config):
 
 if __name__ == '__main__':
     main()
-    # sample command:
-    # python voc2coco.py --path_to_ann_paths ./sample/annpaths_list.txt --labels ./sample/labels.txt --output ./sample/outputs/output.json
