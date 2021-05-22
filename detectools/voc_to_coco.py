@@ -12,7 +12,7 @@ from tqdm import tqdm
 import re
 
 
-def make_ids_from_labels(labels):
+def make_ids_from_labels(labels: List[str]) -> Dict[str, int]:
 
     """Convert labels [strs] to a dictionary of labels:IDs {strings:ints}"""
 
@@ -22,7 +22,7 @@ def make_ids_from_labels(labels):
     return dict(zip(labels, ids))
 
 
-def get_ann_paths(root):
+def get_ann_paths(root: str) -> List[str]:
 
     """From a root directory of annotation xmls, return a list of paths to the xmls"""
 
@@ -60,11 +60,11 @@ def get_image_info(ann_root, extract_num_from_imgid=True):
     return image_info
 
 
-def get_coco_annotation_from_obj(obj, label2id):
+def get_coco_annotation_from_obj(obj, labels_and_ids):
 
     label = obj.findtext('name')
-    assert label in label2id, f"Error: {label} is not in label2id !"
-    category_id = label2id[label]
+    assert label in labels_and_ids, f"Error: {label} is not in labels_and_ids !"
+    category_id = labels_and_ids[label]
 
     bndbox = obj.find('bndbox')
     xmin = int(bndbox.findtext('xmin')) - 1
@@ -88,7 +88,7 @@ def get_coco_annotation_from_obj(obj, label2id):
 
 
 def convert_xmls_to_cocojson(ann_paths: List[str],
-                             label2id: Dict[str, int],
+                             labels_and_ids: Dict[str, int],
                              output_jsonpath: str,
                              extract_num_from_imgid: bool = True):
 
@@ -113,12 +113,12 @@ def convert_xmls_to_cocojson(ann_paths: List[str],
         output_json_dict['images'].append(img_info)
 
         for obj in ann_root.findall('object'):
-            ann = get_coco_annotation_from_obj(obj=obj, label2id=label2id)
+            ann = get_coco_annotation_from_obj(obj=obj, labels_and_ids=labels_and_ids)
             ann.update({'image_id': img_id, 'id': bnd_id})
             output_json_dict['annotations'].append(ann)
             bnd_id = bnd_id + 1
 
-    for label, label_id in label2id.items():
+    for label, label_id in labels_and_ids.items():
         category_info = {'supercategory': 'none', 'id': label_id, 'name': label}
         output_json_dict['categories'].append(category_info)
 
@@ -140,7 +140,7 @@ def main(config):
     ann_paths = get_ann_paths(root=root)
 
     convert_xmls_to_cocojson(ann_paths=ann_paths,
-                             label2id=labels_and_ids,
+                             labels_and_ids=labels_and_ids,
                              output_jsonpath=output,
                              extract_num_from_imgid=True
     )
