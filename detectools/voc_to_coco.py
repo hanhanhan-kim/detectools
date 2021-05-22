@@ -1,9 +1,9 @@
 """
-Originally derived from https://github.com/yukkyo/voc2coco
+Originally modified from https://github.com/yukkyo/voc2coco
 """
 
 import os
-import argparse
+from os.path import basename, expanduser
 import json
 import xml.etree.ElementTree as ET
 from typing import Dict, List
@@ -127,21 +127,14 @@ def convert_xmls_to_cocojson(annotation_paths: List[str],
         f.write(output_json)
 
 
-def main():
+def main(config):
 
-    parser = argparse.ArgumentParser(
-    description='Converts Pascal VOC-formatted XMLs to COCO-formatted JSONs.')
-    parser.add_argument('--path_to_ann_paths', type=str, default=None,
-                        help='path of annotation paths list. It is not need when use --ann_dir and --ann_ids')
-    parser.add_argument('--labels', type=str, default=None,
-                        help='path to label list.')
-    parser.add_argument('--output', type=str, default='output.json', help='path to output json file')
-    args = parser.parse_args()
+    path_to_ann_paths = expanduser(config["voc_to_coco"]["path_to_ann_paths"])
+    labels = expanduser(config["voc_to_coco"]["path_to_labels"])
+    output = expanduser(config["voc_to_coco"]["path_to_output"])
 
-    path_to_ann_paths = args.path_to_ann_paths
-    labels = args.labels
-    output = args.output
-
+    if not output.endswith(".json"):
+        raise ValueError(f"{basename(output)} must end in '.json'")
 
     label2id = get_label2id(labels_path=labels)
 
