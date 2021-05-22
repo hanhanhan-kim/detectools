@@ -1,4 +1,5 @@
 voc_to_coco:
   root: ~/src/voc2coco/sample/Annotations
   labels: ["RBC", "WBC", "Platelets"]
-  path_to_output: ~/src/voc2coco/sample/outputs/output.json
+  path_to_output: ~/src/voc2coco/sample/outputs/
+  train_frac: 0.75

@@ -3,9 +3,10 @@ Modified from https://github.com/yukkyo/voc2coco
 """
 
 import os
-from os.path import basename, expanduser
+from os.path import basename, expanduser, dirname
 from pathlib import Path
 import json
+import random
 import xml.etree.ElementTree as ET
 from typing import Dict, List
 from tqdm import tqdm
@@ -26,9 +27,9 @@ def get_ann_paths(root: str) -> List[str]:
 
     """From a root directory of annotation xmls, return a list of paths to the xmls"""
 
-    xmls = [str(path.absolute()) for path in Path(root).rglob("*.xml")] # recursive
+    ann_paths = [str(path.absolute()) for path in Path(root).rglob("*.xml")] # recursive
     
-    return xmls
+    return ann_paths
 
 
 def get_image_info(ann_root, extract_num_from_imgid=True):
@@ -89,10 +90,13 @@ def get_coco_annotation_from_obj(obj, labels_and_ids):
 
 def convert_xmls_to_cocojson(ann_paths: List[str],
                              labels_and_ids: Dict[str, int],
-                             output_jsonpath: str,
+                             output_json: str, 
                              extract_num_from_imgid: bool = True):
 
-    output_json_dict = {
+    if not output_json.endswith(".json"):
+        raise ValueError(f"{basename(output_json)} is not a .json file")
+
+    data = {
         "images": [],
         "type": "instances",
         "annotations": [],
@@ -100,9 +104,10 @@ def convert_xmls_to_cocojson(ann_paths: List[str],
     }
 
     bnd_id = 1  # START_BOUNDING_BOX_ID, TODO input as args ?
-    print('Start converting !')
 
+    # Start converting:
     for a_path in tqdm(ann_paths):
+
         # Read annotation xml
         ann_tree = ET.parse(a_path)
         ann_root = ann_tree.getroot()
@@ -110,40 +115,68 @@ def convert_xmls_to_cocojson(ann_paths: List[str],
         img_info = get_image_info(ann_root=ann_root,
                                   extract_num_from_imgid=extract_num_from_imgid)
         img_id = img_info['id']
-        output_json_dict['images'].append(img_info)
+        data['images'].append(img_info)
 
         for obj in ann_root.findall('object'):
             ann = get_coco_annotation_from_obj(obj=obj, labels_and_ids=labels_and_ids)
             ann.update({'image_id': img_id, 'id': bnd_id})
-            output_json_dict['annotations'].append(ann)
+            data['annotations'].append(ann)
             bnd_id = bnd_id + 1
 
     for label, label_id in labels_and_ids.items():
         category_info = {'supercategory': 'none', 'id': label_id, 'name': label}
-        output_json_dict['categories'].append(category_info)
+        data['categories'].append(category_info)
 
-    with open(output_jsonpath, 'w') as f:
-        output_json = json.dumps(output_json_dict)
+    with open(output_json, 'w') as f:
+        output_json = json.dumps(data)
         f.write(output_json)
+
+    return data
+
+
+def split_into_train_and_val(ann_paths, output_dir: str, train_frac:float=0.75):
+
+    """Split the list of annotation paths into train and val lists""" 
+
+    if not Path(output_dir).is_dir():
+        raise IOError(f"{basename(output_dir)} must be a directory.")
+    if train_frac <= 0 and train_frac >= 1:
+        raise ValueError(f"train_frac {train_frac} is not between 0 and 1.")
+
+    # Shuffles in place:
+    random.shuffle(ann_paths)
+    border = int(train_frac * len(ann_paths))
+    train_ann_paths = ann_paths[:border]
+    val_ann_paths = ann_paths[border:]
+
+    return train_ann_paths, val_ann_paths
 
 
 def main(config):
 
     root = expanduser(config["voc_to_coco"]["root"])
     labels = config["voc_to_coco"]["labels"]
-    output = expanduser(config["voc_to_coco"]["path_to_output"])
-
-    if not output.endswith(".json"):
-        raise ValueError(f"{basename(output)} must end in '.json'")
+    output_dir = expanduser(config["voc_to_coco"]["path_to_output"])
+    train_frac = config["voc_to_coco"]["train_frac"]
 
     labels_and_ids = make_ids_from_labels(labels=labels)
-    ann_paths = get_ann_paths(root=root)
+    
+    all_ann_paths = get_ann_paths(root=root)
+    train_ann_paths, val_ann_paths = split_into_train_and_val(ann_paths=all_ann_paths, 
+                                                              output_dir=output_dir, 
+                                                              train_frac=train_frac)
+    all_paths = [all_ann_paths, train_ann_paths, val_ann_paths]
 
-    convert_xmls_to_cocojson(ann_paths=ann_paths,
-                             labels_and_ids=labels_and_ids,
-                             output_jsonpath=output,
-                             extract_num_from_imgid=True
-    )
+    output_jsons = ["all.json", "train.json", "val.json"]
+    output_jsons = [os.path.join(output_dir, json) for json in output_jsons]
+
+
+    for paths, output_json, in zip(all_paths, output_jsons):
+
+        data = convert_xmls_to_cocojson(ann_paths=paths,
+                                        labels_and_ids=labels_and_ids,
+                                        output_json=output_json,
+                                        extract_num_from_imgid=True)
 
 
 if __name__ == '__main__':
