@@ -1,4 +1,4 @@
 voc_to_coco:
-  path_to_ann_paths: ~/src/voc2coco/sample/annpaths_list.txt
-  path_to_labels: ~/src/voc2coco/sample/labels.txt
+  root: ~/src/voc2coco/sample/Annotations
+  labels: ["RBC", "WBC", "Platelets"]
   path_to_output: ~/src/voc2coco/sample/outputs/output.json

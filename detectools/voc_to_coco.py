@@ -4,6 +4,7 @@ Modified from https://github.com/yukkyo/voc2coco
 
 import os
 from os.path import basename, expanduser
+from pathlib import Path
 import json
 import xml.etree.ElementTree as ET
 from typing import Dict, List
@@ -11,32 +12,31 @@ from tqdm import tqdm
 import re
 
 
-def get_label2id(labels_path: str) -> Dict[str, int]:
+def make_ids_from_labels(labels):
 
-    """IDs start at 1 instead of 0"""
+    """Convert labels [strs] to a dictionary of labels:IDs {strings:ints}"""
 
-    with open(labels_path, 'r') as f:
-        labels_str = f.read().split()
-    labels_ids = list(range(1, len(labels_str)+1))
+    # IDs start at 1 instead of 0
+    ids = list(range(1, len(labels)+1))
 
-    return dict(zip(labels_str, labels_ids))
-
-
-def get_annpaths(path_to_ann_paths: str = None) -> List[str]:
-
-    if path_to_ann_paths is not None:
-        with open(path_to_ann_paths, 'r') as f:
-            ann_paths = f.read().split()
-
-    return ann_paths
+    return dict(zip(labels, ids))
 
 
-def get_image_info(annotation_root, extract_num_from_imgid=True):
+def get_ann_paths(root):
 
-    path = annotation_root.findtext('path')
+    """From a root directory of annotation xmls, return a list of paths to the xmls"""
+
+    xmls = [str(path.absolute()) for path in Path(root).rglob("*.xml")] # recursive
+    
+    return xmls
+
+
+def get_image_info(ann_root, extract_num_from_imgid=True):
+
+    path = ann_root.findtext('path')
 
     if path is None:
-        filename = annotation_root.findtext('filename')
+        filename = ann_root.findtext('filename')
     else:
         filename = os.path.basename(path)
 
@@ -46,7 +46,7 @@ def get_image_info(annotation_root, extract_num_from_imgid=True):
     if extract_num_from_imgid and isinstance(img_id, str):
         img_id = int(re.findall(r'\d+', img_id)[0])
 
-    size = annotation_root.find('size')
+    size = ann_root.find('size')
     width = int(size.findtext('width'))
     height = int(size.findtext('height'))
 
@@ -87,7 +87,7 @@ def get_coco_annotation_from_obj(obj, label2id):
     return ann
 
 
-def convert_xmls_to_cocojson(annotation_paths: List[str],
+def convert_xmls_to_cocojson(ann_paths: List[str],
                              label2id: Dict[str, int],
                              output_jsonpath: str,
                              extract_num_from_imgid: bool = True):
@@ -102,12 +102,12 @@ def convert_xmls_to_cocojson(annotation_paths: List[str],
     bnd_id = 1  # START_BOUNDING_BOX_ID, TODO input as args ?
     print('Start converting !')
 
-    for a_path in tqdm(annotation_paths):
+    for a_path in tqdm(ann_paths):
         # Read annotation xml
         ann_tree = ET.parse(a_path)
         ann_root = ann_tree.getroot()
 
-        img_info = get_image_info(annotation_root=ann_root,
+        img_info = get_image_info(ann_root=ann_root,
                                   extract_num_from_imgid=extract_num_from_imgid)
         img_id = img_info['id']
         output_json_dict['images'].append(img_info)
@@ -129,18 +129,18 @@ def convert_xmls_to_cocojson(annotation_paths: List[str],
 
 def main(config):
 
-    path_to_ann_paths = expanduser(config["voc_to_coco"]["path_to_ann_paths"])
-    labels = expanduser(config["voc_to_coco"]["path_to_labels"])
+    root = expanduser(config["voc_to_coco"]["root"])
+    labels = config["voc_to_coco"]["labels"]
     output = expanduser(config["voc_to_coco"]["path_to_output"])
 
     if not output.endswith(".json"):
         raise ValueError(f"{basename(output)} must end in '.json'")
 
-    label2id = get_label2id(labels_path=labels)
-    ann_paths = get_annpaths(path_to_ann_paths=path_to_ann_paths)
-    
-    convert_xmls_to_cocojson(annotation_paths=ann_paths,
-                             label2id=label2id,
+    labels_and_ids = make_ids_from_labels(labels=labels)
+    ann_paths = get_ann_paths(root=root)
+
+    convert_xmls_to_cocojson(ann_paths=ann_paths,
+                             label2id=labels_and_ids,
                              output_jsonpath=output,
                              extract_num_from_imgid=True
     )
