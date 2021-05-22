@@ -131,8 +131,6 @@ def convert_xmls_to_cocojson(ann_paths: List[str],
         output_json = json.dumps(data)
         f.write(output_json)
 
-    return data
-
 
 def split_into_train_and_val(ann_paths, output_dir: str, train_frac:float=0.75):
 
@@ -173,10 +171,10 @@ def main(config):
 
     for paths, output_json, in zip(all_paths, output_jsons):
 
-        data = convert_xmls_to_cocojson(ann_paths=paths,
-                                        labels_and_ids=labels_and_ids,
-                                        output_json=output_json,
-                                        extract_num_from_imgid=True)
+        convert_xmls_to_cocojson(ann_paths=paths,
+                                 labels_and_ids=labels_and_ids,
+                                 output_json=output_json,
+                                 extract_num_from_imgid=True)
 
 
 if __name__ == '__main__':
