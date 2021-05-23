@@ -50,7 +50,7 @@ def main(config):
     # For saving images with predicted labels:
     makedirs(join(model_root, "test_pred_imgs"), exist_ok=True)
 
-    # Select random images to visualize the prediction results:
+    # Select random images to visualize and save the prediction results:
     for i,d in enumerate(random.sample(datasets, number_of_imgs)):
 
         id = d["image_id"]
@@ -93,10 +93,10 @@ def main(config):
             score = float(scores[i].numpy())
             thing_id = thing_ids[i] # is int
             thing_class = metadata.thing_classes[thing_id]
-            all_boxes.append([int(coords[0][0]), 
-                              int(coords[0][1]), 
-                              int(coords[0][2]), 
-                              int(coords[0][3]), 
+            all_boxes.append([int(coords[0][0]), # x1
+                              int(coords[0][1]), # y1
+                              int(coords[0][2]), # x2
+                              int(coords[0][3]), # y2
                               score,
                               thing_class])
 
