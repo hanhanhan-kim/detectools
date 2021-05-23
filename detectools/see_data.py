@@ -27,7 +27,9 @@ def main(config):
         id = d["image_id"]
         img = cv2.imread(d["file_name"])
 
-        visualizer = Visualizer(img[:, :, ::-1], metadata=metadata, scale=scale)
+        visualizer = Visualizer(img[:, :, ::-1], 
+                                metadata=metadata, 
+                                scale=scale)
         out = visualizer.draw_dataset_dict(d)
 
         cv2.imshow(f"image {id}", out.get_image()[:, :, ::-1])

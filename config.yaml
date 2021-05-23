@@ -23,3 +23,5 @@ train_model:
 
 make_predictions:
   testing_thresh: 0.5 # set the testing threshold for this model
+  number_of_imgs: 5
+  scale: 1.0
