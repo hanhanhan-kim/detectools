@@ -1,4 +1,4 @@
-from os import makedirs, getcwd
+from os import makedirs
 from os.path import expanduser, dirname
 import os
 
@@ -52,6 +52,6 @@ def main(config):
 
     # Train the model with the above settings:
     makedirs(cfg.OUTPUT_DIR, exist_ok=True) # save
-    trainer = DefaultTrainer(cfg)
+    trainer = CocoTrainer(cfg)
     trainer.resume_or_load(resume=False)
     trainer.train()

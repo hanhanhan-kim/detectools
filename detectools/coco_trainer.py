@@ -84,10 +84,10 @@ class CocoTrainer(DefaultTrainer):
             output_folder = os.path.join(cfg.OUTPUT_DIR, "inference")
         return COCOEvaluator(dataset_name, cfg, True, output_folder)
                      
-    def build_hooks(self, cfg):
+    def build_hooks(self):
         hooks = super().build_hooks()
         hooks.insert(-1,LossEvalHook(
-            cfg.TEST.EVAL_PERIOD,
+            self.cfg.TEST.EVAL_PERIOD,
             self.model,
             build_detection_test_loader(
                 self.cfg,
