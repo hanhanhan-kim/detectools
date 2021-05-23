@@ -8,6 +8,7 @@ from detectron2.engine import DefaultTrainer
 from detectron2.data import MetadataCatalog, DatasetCatalog
 
 from detectools.utils import register_data
+from detectools.coco_trainer import CocoTrainer
 
 
 def main(config):
@@ -35,11 +36,10 @@ def main(config):
     cfg.DATASETS.TEST = ("val_data",)  
     cfg.TEST.EVAL_PERIOD = 100 
 
-    # Can't seem to initialize these particular weights from model zoo, even though I'm referencing the API
-    # API that maps the model zoo URLs: https://detectron2.readthedocs.io/en/latest/_modules/detectron2/model_zoo/model_zoo.html
-    # The weights were downloaded from https://github.com/facebookresearch/detectron2/blob/master/MODEL_ZOO.md
+    # API that maps the model zoo URLs (add .yaml to each one): https://detectron2.readthedocs.io/en/latest/_modules/detectron2/model_zoo/model_zoo.html
+    # The weights can also be downloaded from https://github.com/facebookresearch/detectron2/blob/master/MODEL_ZOO.md
     # TODO: Mention in docs that I"m only supporting 1 model with this wrapper right now:
-    cfg.MODEL.WEIGHTS = os.path.join(dirname(getcwd()), "detectools/detectools/pretrained_weights/model_final_721ade.pkl")
+    cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-Detection/faster_rcnn_R_50_C4_1x.yaml")
 
     cfg.DATALOADER.NUM_WORKERS = 2
     cfg.SOLVER.IMS_PER_BATCH = 2

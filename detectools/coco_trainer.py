@@ -8,6 +8,7 @@ import torch
 
 from detectron2.evaluation import COCOEvaluator
 from detectron2.engine.hooks import HookBase
+from detectron2.engine import DefaultTrainer
 import detectron2.utils.comm as comm
 from detectron2.utils.logger import log_every_n_seconds
 from detectron2.data import DatasetMapper, build_detection_test_loader
@@ -75,7 +76,7 @@ class LossEvalHook(HookBase):
         self.trainer.storage.put_scalars(timetest=12)
 
 
-class MyTrainer(DefaultTrainer):
+class CocoTrainer(DefaultTrainer):
 
     @classmethod
     def build_evaluator(cls, cfg, dataset_name, output_folder=None):
