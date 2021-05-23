@@ -4,9 +4,11 @@ import os
 
 from detectron2 import model_zoo
 from detectron2.config import get_cfg
-from detectron2.engine import DefaultTrainer, DefaultPredictor
+from detectron2.engine import DefaultTrainer
+from detectron2.data import MetadataCatalog, DatasetCatalog
 
 from detectools.utils import register_data
+
 
 def main(config):
 
@@ -14,6 +16,9 @@ def main(config):
     imgs_root = expanduser(config["see_data"]["imgs_root"]) # from previous command
 
     register_data(json_dir, imgs_root)
+
+    # datasets = DatasetCatalog.get("training_data")
+    metadata = MetadataCatalog.get("training_data").set(evaluator_type="coco") # TODO: say in docs that I only support coco
 
     # Load Detectron2's default config:
     cfg = get_cfg()

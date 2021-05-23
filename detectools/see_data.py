@@ -19,7 +19,7 @@ def main(config):
 
     # Training data:
     datasets = DatasetCatalog.get("training_data")
-    metadata = MetadataCatalog.get("training_data").set(evaluator_type="coco")
+    metadata = MetadataCatalog.get("training_data").set(evaluator_type="coco") # TODO: say in docs that I only support coco
 
     # Show images:
     for i,d in enumerate(random.sample(datasets, number_of_imgs)):
