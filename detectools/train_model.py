@@ -1,9 +1,10 @@
 from os import makedirs
 from os.path import expanduser
+from os.path import join 
 
 from detectron2 import model_zoo
 from detectron2.config import get_cfg
-from detectron2.engine import DefaultTrainer
+# from detectron2.engine import DefaultTrainer # I use my CocoTrainer instead
 from detectron2.data import MetadataCatalog, DatasetCatalog
 
 from detectools.utils import register_data
@@ -21,12 +22,12 @@ def main(config):
     eval_period = int(config["train_model"]["eval_period"])
     model_root = expanduser(config["base"]["model_root"])
 
-    if not 0 < loss_rate < 0.1:
+    if not 0 < loss_rate < 1:
         raise ValueError(f"The loss rate, {loss_rate}, must be between 0 and 1.")
 
     register_data(json_root, imgs_root)
 
-    # need this, in order for metadata to have thing_classes attrib
+    # Need this datasets line, in order for metadata to have .thing_classes attribute
     datasets = DatasetCatalog.get("training_data") 
     metadata = MetadataCatalog.get("training_data").set(evaluator_type="coco") 
 
@@ -53,10 +54,14 @@ def main(config):
 
     cfg.OUTPUT_DIR = model_root
 
+    # Save settings for later; write the string rep of cfg:
+    with open(join(model_root, "cfg.txt"), "w") as f:
+        f.write(cfg.dump())
+    
     # Train the model with the above settings!:
     makedirs(cfg.OUTPUT_DIR, exist_ok=True) # save
     trainer = CocoTrainer(cfg)
     trainer.resume_or_load(resume=False)
     trainer.train()
 
-    # TODO: say in docs that I only support coco
+    # TODO: Say in docs that I only support coco

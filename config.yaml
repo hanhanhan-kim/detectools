@@ -15,6 +15,11 @@ see_data:
   scale: 1.0
 
 train_model:
-  loss_rate: 0.02
-  max_iter: 300
-  eval_period: 100
+  loss_rate: 0.02 # Pick a good loss rate
+  max_iter: 300 # Max number of iterations
+  eval_period: 100 # will do an evluation once every this many iters on cfg.DATASETS.TEST
+  # TODO: param for SOLVER.STEPS
+  # TODO: param for BATCH_SIZE_PER_IMAGE?
+
+make_predictions:
+  testing_thresh: 0.5 # set the testing threshold for this model

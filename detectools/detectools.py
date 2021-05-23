@@ -1,5 +1,7 @@
 from pathlib import Path
+from os.path import expanduser
 from pprint import pprint
+import subprocess
 
 import click
 import yaml
@@ -56,6 +58,20 @@ def train_model(config):
     from detectools import train_model
     click.echo("\nTraining model ...")
     train_model.main(config)
+
+@cli.command()
+@pass_config
+def see_tensorboard(config):
+    model = expanduser(config["base"]["model_root"])
+    subprocess.run(["tensorboard", "--logdir", model])
+    # TODO: Have it open http://localhost:6006/ (Press CTRL+C to quit)
+
+@cli.command()
+@pass_config
+def make_predictions(config):
+    from detectools import make_predictions
+    click.echo("\nMaking predictions ...")
+    make_predictions.main(config)
 
 
 if __name__ == "__main__":
