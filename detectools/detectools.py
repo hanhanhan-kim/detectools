@@ -43,6 +43,20 @@ def voc_to_coco(config):
     click.echo("\nConverting ...")
     voc_to_coco.main(config)
 
+@cli.command()
+@pass_config
+def see_data(config):
+    from detectools import see_data
+    click.echo("\nShowing training data ...")
+    see_data.main(config)
+
+@cli.command()
+@pass_config
+def train_model(config):
+    from detectools import train_model
+    click.echo("\nTraining model ...")
+    train_model.main(config)
+
 
 if __name__ == "__main__":
     cli()

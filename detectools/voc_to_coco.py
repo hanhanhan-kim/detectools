@@ -141,8 +141,7 @@ def split_into_train_and_val(ann_paths, output_dir: str, train_frac:float=0.75):
     if train_frac <= 0 and train_frac >= 1:
         raise ValueError(f"train_frac {train_frac} is not between 0 and 1.")
 
-    # Shuffles in place:
-    random.shuffle(ann_paths)
+    random.shuffle(ann_paths) # Shuffles in place
     border = int(train_frac * len(ann_paths))
     train_ann_paths = ann_paths[:border]
     val_ann_paths = ann_paths[border:]
@@ -154,7 +153,7 @@ def main(config):
 
     root = expanduser(config["voc_to_coco"]["root"])
     labels = config["voc_to_coco"]["labels"]
-    output_dir = expanduser(config["voc_to_coco"]["path_to_output"])
+    output_dir = expanduser(config["voc_to_coco"]["output_dir"])
     train_frac = config["voc_to_coco"]["train_frac"]
 
     labels_and_ids = make_ids_from_labels(labels=labels)
