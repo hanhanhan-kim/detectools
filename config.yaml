@@ -1,17 +1,20 @@
+# For toy data:
+
+base:
+  json_root: ~/src/voc2coco/sample/jsons/ # to save output all.json, train.json and val.json in
+  imgs_root:  ~/src/voc2coco/JPEGImages # original imgs
+  model_root: ~/src/voc2coco/sample/output/ # model output to save in
+
 voc_to_coco:
-
-  # For sample data:
-  root: ~/src/voc2coco/sample/Annotations
+  ann_root: ~/src/voc2coco/sample/Annotations
   labels: ["RBC", "WBC", "Platelets"]
-  output_dir: ~/src/voc2coco/sample/outputs/
   train_frac: 0.75
-
-  # root:
-  # labels:
-  # output_dir:
-  # train_frac: 0.75
   
 see_data:
-  imgs_root: ~/src/voc2coco/JPEGImages
   number_of_imgs: 5
   scale: 1.0
+
+train_model:
+  loss_rate: 0.02
+  max_iter: 300
+  eval_period: 100

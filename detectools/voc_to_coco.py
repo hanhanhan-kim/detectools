@@ -23,11 +23,11 @@ def make_ids_from_labels(labels: List[str]) -> Dict[str, int]:
     return dict(zip(labels, ids))
 
 
-def get_ann_paths(root: str) -> List[str]:
+def get_ann_paths(ann_root: str) -> List[str]:
 
     """From a root directory of annotation xmls, return a list of paths to the xmls"""
 
-    ann_paths = [str(path.absolute()) for path in Path(root).rglob("*.xml")] # recursive
+    ann_paths = [str(path.absolute()) for path in Path(ann_root).rglob("*.xml")] # recursive
     
     return ann_paths
 
@@ -151,21 +151,21 @@ def split_into_train_and_val(ann_paths, output_dir: str, train_frac:float=0.75):
 
 def main(config):
 
-    root = expanduser(config["voc_to_coco"]["root"])
+    ann_root = expanduser(config["voc_to_coco"]["ann_root"])
     labels = config["voc_to_coco"]["labels"]
-    output_dir = expanduser(config["voc_to_coco"]["output_dir"])
+    json_root = expanduser(config["base"]["json_root"]) # output dir
     train_frac = config["voc_to_coco"]["train_frac"]
 
     labels_and_ids = make_ids_from_labels(labels=labels)
     
-    all_ann_paths = get_ann_paths(root=root)
+    all_ann_paths = get_ann_paths(ann_root=ann_root)
     train_ann_paths, val_ann_paths = split_into_train_and_val(ann_paths=all_ann_paths, 
-                                                              output_dir=output_dir, 
+                                                              output_dir=json_root, 
                                                               train_frac=train_frac)
     all_paths = [all_ann_paths, train_ann_paths, val_ann_paths]
 
     output_jsons = ["all.json", "train.json", "val.json"]
-    output_jsons = [os.path.join(output_dir, json) for json in output_jsons]
+    output_jsons = [os.path.join(json_root, json) for json in output_jsons]
 
 
     for paths, output_json, in zip(all_paths, output_jsons):

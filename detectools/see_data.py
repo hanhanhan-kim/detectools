@@ -10,12 +10,12 @@ from detectools.utils import register_data
 
 def main(config):
     
-    json_dir = expanduser(config["voc_to_coco"]["output_dir"]) # from previous command
-    imgs_root = expanduser(config["see_data"]["imgs_root"])
+    json_root = expanduser(config["base"]["json_root"])
+    imgs_root = expanduser(config["base"]["imgs_root"])
     scale = float(config["see_data"]["scale"])
     number_of_imgs = int(config["see_data"]["number_of_imgs"])
 
-    register_data(json_dir, imgs_root)
+    register_data(json_root, imgs_root)
 
     # Training data:
     datasets = DatasetCatalog.get("training_data")
