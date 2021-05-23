@@ -20,9 +20,10 @@ train_model:
   lr_decay_policy: [] # Each element in this list states the iteration no. at which the LR will decay by a factor of 10. If empty, the LR will not decay.
   max_iter: 300 # Max number of iterations
   eval_period: 100 # will do an evluation once every this many iters on cfg.DATASETS.TEST
+  checkpoint_period: 100 # will save the model .pth this many iterations; doesn't make sense for this val to be smaller than eval_period
   # TODO: param for BATCH_SIZE_PER_IMAGE?
 
-make_predictions:
+eval_model:
   testing_thresh: 0.5 # set the testing threshold for this model
   number_of_imgs: 5
   scale: 1.0

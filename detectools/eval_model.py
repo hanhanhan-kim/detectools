@@ -19,10 +19,10 @@ def main(config):
     imgs_root = expanduser(config["base"]["imgs_root"])
     model_root = expanduser(config["base"]["model_root"])
 
-    testing_thresh = float(config["make_predictions"]["testing_thresh"])
-    scale = float(config["make_predictions"]["scale"])
-    number_of_imgs = int(config["make_predictions"]["number_of_imgs"])
-    do_show = config["make_predictions"]["do_show"]
+    testing_thresh = float(config["eval_model"]["testing_thresh"])
+    scale = float(config["eval_model"]["scale"])
+    number_of_imgs = int(config["eval_model"]["number_of_imgs"])
+    do_show = config["eval_model"]["do_show"]
 
     if not 0 < testing_thresh < 1:
         raise ValueError(f"The testing threshold, {testing_thresh}, must be between 0 and 1.")

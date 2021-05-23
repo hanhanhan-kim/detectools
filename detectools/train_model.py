@@ -21,6 +21,7 @@ def main(config):
     lr_decay_policy = config["train_model"]["lr_decay_policy"]
     max_iter = int(config["train_model"]["max_iter"])
     eval_period = int(config["train_model"]["eval_period"])
+    checkpoint_period = int(config["train_model"]["checkpoint_period"])
     model_root = expanduser(config["base"]["model_root"])
 
     if not 0 < learning_rate < 1:
@@ -28,6 +29,9 @@ def main(config):
     for iter_num in lr_decay_policy:
         if not isinstance(iter_num, int):
             raise TypeError(f"The iteration number, {iter_num}, in {lr_decay_policy} must be an integer.")
+    if checkpoint_period < eval_period:
+        raise ValueError(f"The checkpoint period, {checkpoint_period}, is less than the evaluation period {eval_period}."
+                         "It doesn't make sense to save the model more frequently than its evaluation.")
 
     register_data(json_root, imgs_root)
 
@@ -46,6 +50,7 @@ def main(config):
     # # https://ortegatron.medium.com/training-on-detectron2-with-a-validation-set-and-plot-loss-on-it-to-avoid-overfitting-6449418fbf4e
     cfg.DATASETS.TEST = ("val_data",)  # our val dataset
     cfg.TEST.EVAL_PERIOD = eval_period # will do an evluation once every this many iters on cfg.DATASETS.TEST
+    cfg.SOLVER.CHECKPOINT_PERIOD = checkpoint_period # save the model .pth this many iterations
 
     # API that maps the model zoo URLs (add .yaml to each one): https://detectron2.readthedocs.io/en/latest/_modules/detectron2/model_zoo/model_zoo.html
     cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-Detection/faster_rcnn_R_50_C4_1x.yaml")
