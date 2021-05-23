@@ -1,5 +1,6 @@
 import random
-from os.path import expanduser, join
+from os.path import expanduser, join, basename
+from os import makedirs
 import json
 
 import numpy as np
@@ -46,23 +47,27 @@ def main(config):
     print("Generating predictor ...")
     predictor = DefaultPredictor(cfg)
 
+    # For saving images with predicted labels:
+    makedirs(join(model_root, "test_pred_imgs"), exist_ok=True)
+
     # Select random images to visualize the prediction results:
     for i,d in enumerate(random.sample(datasets, number_of_imgs)):
 
         id = d["image_id"]
         img = cv2.imread(d["file_name"])
         outputs = predictor(img)
+        
+        # Visualize:
+        visualizer = Visualizer(img[:, :, ::-1], 
+                                metadata=metadata, 
+                                scale=scale, 
+                                instance_mode=ColorMode)
+        visualizer = visualizer.draw_instance_predictions(outputs["instances"].to("cpu"))        
+        pred_img = visualizer.get_image()[:, :, ::-1]
 
         if do_show:
-            
-            # Visualize:
-            visualizer = Visualizer(img[:, :, ::-1], 
-                                    metadata=metadata, 
-                                    scale=scale, 
-                                    instance_mode=ColorMode)
-            visualizer = visualizer.draw_instance_predictions(outputs["instances"].to("cpu"))        
 
-            cv2.imshow(f"prediction on image {id}", visualizer.get_image()[:, :, ::-1])
+            cv2.imshow(f"prediction on image {id}", pred_img)
             print(f"Press any key to go to the next image ({i+1}/{number_of_imgs}) ...")
 
             key = cv2.waitKey(0) & 0xFF
@@ -70,12 +75,15 @@ def main(config):
                 print("Quitting ...")
                 break
 
-            cv2.destroyAllWindows()
+        cv2.destroyAllWindows()
+
+        cv2.imwrite(join(model_root, "test_pred_imgs", ("predicted_" + basename(d["file_name"]))), pred_img)
 
         # Save the predicted box coords and scores to a dictionary:
         test_preds = {}
         preds = outputs['instances'].to('cpu')
         boxes = preds.pred_boxes
+        thing_ids = preds.pred_classes.tolist()
         scores = preds.scores
         num_boxes = np.array(scores.size())[0]
         all_boxes = []
@@ -83,11 +91,14 @@ def main(config):
         for i in range(0, num_boxes):
             coords = boxes[i].tensor.numpy()    	
             score = float(scores[i].numpy())
+            thing_id = thing_ids[i] # is int
+            thing_class = metadata.thing_classes[thing_id]
             all_boxes.append([int(coords[0][0]), 
                               int(coords[0][1]), 
                               int(coords[0][2]), 
                               int(coords[0][3]), 
-                              score])
+                              score,
+                              thing_class])
 
         test_preds[d["file_name"]] = all_boxes
 
