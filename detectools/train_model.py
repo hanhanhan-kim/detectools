@@ -17,13 +17,17 @@ def main(config):
     json_root = expanduser(config["base"]["json_root"])
     imgs_root = expanduser(config["base"]["imgs_root"])
 
-    loss_rate = float(config["train_model"]["loss_rate"])
+    learning_rate = float(config["train_model"]["learning_rate"])
+    lr_decay_policy = config["train_model"]["lr_decay_policy"]
     max_iter = int(config["train_model"]["max_iter"])
     eval_period = int(config["train_model"]["eval_period"])
     model_root = expanduser(config["base"]["model_root"])
 
-    if not 0 < loss_rate < 1:
-        raise ValueError(f"The loss rate, {loss_rate}, must be between 0 and 1.")
+    if not 0 < learning_rate < 1:
+        raise ValueError(f"The learning rate, {learning_rate}, must be between 0 and 1.")
+    for iter_num in lr_decay_policy:
+        if not isinstance(iter_num, int):
+            raise TypeError(f"The iteration number, {iter_num}, in {lr_decay_policy} must be an integer.")
 
     register_data(json_root, imgs_root)
 
@@ -47,7 +51,8 @@ def main(config):
     cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-Detection/faster_rcnn_R_50_C4_1x.yaml")
     cfg.DATALOADER.NUM_WORKERS = 2
     cfg.SOLVER.IMS_PER_BATCH = 2
-    cfg.SOLVER.BASE_LR = 0.02 # Pick a good loss rate
+    cfg.SOLVER.BASE_LR = learning_rate # Pick a good learning rate
+    cfg.SOLVER.STEPS = lr_decay_policy # Each element in this list states the iteration no. at which the LR will decay by a factor of 10. If empty, the LR will not decay.
     cfg.SOLVER.MAX_ITER = (max_iter) # Max number of iterations
     cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = (128)  # faster, and good enough for this toy dataset; default is 512
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(metadata.thing_classes)  # refers to number of classes, e.g. labels. E.g. WBC, RBC, platelet
