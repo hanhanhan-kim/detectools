@@ -68,10 +68,10 @@ def see_tensorboard(config):
 
 @cli.command()
 @pass_config
-def make_predictions(config):
-    from detectools import make_predictions
-    click.echo("\nMaking predictions ...")
-    make_predictions.main(config)
+def eval_model(config):
+    from detectools import eval_model
+    click.echo("\nEvaluating model ...")
+    eval_model.main(config)
 
 
 if __name__ == "__main__":

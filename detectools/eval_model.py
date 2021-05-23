@@ -95,4 +95,4 @@ def main(config):
     output_json = join(model_root, "test_preds.json")
     with open(output_json, "w") as f:
         json.dump(test_preds, f)
-    print(f"Saved predictions to {output_json}")
+    print(f"Saved test predictions to {output_json}")
