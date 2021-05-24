@@ -162,7 +162,7 @@ def main(config):
     train_frac = config["voc_to_coco"]["train_frac"]
 
     jsons_dir = join(root, "jsons")
-    os.makedirs(jsons_dir)
+    os.makedirs(jsons_dir, exist_ok=True) # will overwrite
 
     labels_and_ids = make_ids_from_labels(labels=labels)
     
@@ -182,6 +182,8 @@ def main(config):
                                  labels_and_ids=labels_and_ids,
                                  output_json=output_json,
                                  extract_num_from_imgid=True)
+
+    print(f"All .json files have been written to {jsons_dir}")
 
 
 if __name__ == '__main__':

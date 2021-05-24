@@ -16,9 +16,10 @@ from detectools.utils import register_data
 
 def main(config):
 
-    json_root = expanduser(config["base"]["json_root"])
+    root = expanduser(config["base"]["root"])
     imgs_root = expanduser(config["base"]["imgs_root"])
     model_root = expanduser(config["base"]["model_root"])
+    jsons_dir = join(root, "jsons")
 
     model_pth = expanduser(config["analyze_vids"]["model_pth"])
     score_cutoff = float(config["analyze_vids"]["score_cutoff"])
@@ -35,7 +36,7 @@ def main(config):
 
     vids = [str(path.absolute()) for path in Path(vids_root).rglob("*.h264")]
 
-    register_data(json_root, imgs_root)
+    register_data(jsons_dir, imgs_root)
 
     # Need the `datasets =` line, in order for metadata to have the 
     # .thing_classes attrib. I don't really use these two lines, I 

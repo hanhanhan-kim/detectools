@@ -16,14 +16,15 @@ from detectools.utils import register_data
 
 def main(config):
 
-    json_root = expanduser(config["base"]["json_root"])
+    root = expanduser(config["base"]["root"])
     imgs_root = expanduser(config["base"]["imgs_root"])
     model_root = expanduser(config["base"]["model_root"])
+    jsons_dir = join(root, "jsons")
 
     scale = float(config["eval_model"]["scale"])
     do_show = config["eval_model"]["do_show"]
 
-    register_data(json_root, imgs_root)
+    register_data(jsons_dir, imgs_root)
 
     # Need this datasets line, in order for metadata to have .thing_classes attribute
     datasets = DatasetCatalog.get("test_data") 

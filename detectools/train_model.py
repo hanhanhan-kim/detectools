@@ -14,8 +14,9 @@ from torch._C import Value
 
 def main(config):
 
-    json_root = expanduser(config["base"]["json_root"])
+    root = expanduser(config["base"]["root"])
     imgs_root = expanduser(config["base"]["imgs_root"])
+    jsons_dir = join(root, "jsons")
 
     learning_rate = float(config["train_model"]["learning_rate"])
     lr_decay_policy = config["train_model"]["lr_decay_policy"]
@@ -33,7 +34,7 @@ def main(config):
         raise ValueError(f"The checkpoint period, {checkpoint_period}, is less than the evaluation period {eval_period}."
                          "It doesn't make sense to save the model more frequently than its evaluation.")
 
-    register_data(json_root, imgs_root)
+    register_data(jsons_dir, imgs_root)
 
     # Need this datasets line, in order for metadata to have .thing_classes attribute
     datasets = DatasetCatalog.get("training_data") 

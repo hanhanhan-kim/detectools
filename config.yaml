@@ -1,7 +1,7 @@
 # For toy data:
 
 base:
-  json_root: ~/src/voc2coco/sample/jsons/ # to save output all.json, train.json and val.json in
+  root:  ~/src/voc2coco/sample
   imgs_root:  ~/src/voc2coco/JPEGImages # original imgs
   model_root: ~/src/voc2coco/sample/output/ # model output to save in
 

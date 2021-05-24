@@ -1,5 +1,5 @@
 import random
-from os.path import expanduser
+from os.path import expanduser, join
 
 import cv2
 from detectron2.utils.visualizer import Visualizer
@@ -10,12 +10,13 @@ from detectools.utils import register_data
 
 def main(config):
     
-    json_root = expanduser(config["base"]["json_root"])
+    root = expanduser(config["base"]["root"])
     imgs_root = expanduser(config["base"]["imgs_root"])
     scale = float(config["see_data"]["scale"])
     number_of_imgs = int(config["see_data"]["number_of_imgs"])
+    jsons_dir = join(root, "jsons")
 
-    register_data(json_root, imgs_root)
+    register_data(jsons_dir, imgs_root)
 
     # Training data:
     datasets = DatasetCatalog.get("training_data")
