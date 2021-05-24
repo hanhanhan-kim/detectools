@@ -54,6 +54,8 @@ def main(config):
     all_test_preds = []
     for i,d in enumerate(random.sample(datasets, number_of_imgs)):
 
+        print(f"Predicting on image {i+1} of {number_of_imgs} ...")
+        
         id = d["image_id"]
         img = cv2.imread(d["file_name"])
         detected = predictor(img)
