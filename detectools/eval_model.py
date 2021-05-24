@@ -51,6 +51,7 @@ def main(config):
     makedirs(join(model_root, "test_pred_imgs"), exist_ok=True)
 
     # Select random images to visualize and save the prediction results:
+    all_test_preds = []
     for i,d in enumerate(random.sample(datasets, number_of_imgs)):
 
         id = d["image_id"]
@@ -99,11 +100,12 @@ def main(config):
                               int(coords[0][3]), # y2
                               score,
                               thing_class])
-
         test_preds[d["file_name"]] = all_boxes
 
+        all_test_preds.append(test_preds)
+
     # Write the dictionary to a json:
-    output_json = join(model_root, "test_preds.json")
+    output_json = join(model_root, "all_test_preds.json")
     with open(output_json, "w") as f:
-        json.dump(test_preds, f)
+        json.dump(all_test_preds, f)
     print(f"Saved test predictions to {output_json}")
