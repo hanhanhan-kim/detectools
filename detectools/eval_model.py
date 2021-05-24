@@ -1,7 +1,8 @@
 import random
 from os.path import expanduser, join, basename
 from os import makedirs
-import json
+import csv
+import atexit
 
 import numpy as np
 import cv2
@@ -30,7 +31,8 @@ def main(config):
     register_data(json_root, imgs_root)
 
     # Need this datasets line, in order for metadata to have .thing_classes attribute
-    datasets = DatasetCatalog.get("training_data") 
+    # TODO: Use val data from val.json instead! Use all of it.
+    datasets = DatasetCatalog.get("training_data") # TODO!!!!!!!!!!!!!!
     metadata = MetadataCatalog.get("training_data").set(evaluator_type="coco")
     
     # Read the cfg back in:
@@ -50,12 +52,20 @@ def main(config):
     # For saving images with predicted labels:
     makedirs(join(model_root, "test_pred_imgs"), exist_ok=True)
 
+    # For saving detection predictions as csv:
+    output_csv = join(model_root, "all_test_preds.csv")
+    csv_file_handle = open(output_csv, "w", newline="")
+    atexit.register(csv_file_handle.close) 
+    col_names = ["img", "x1", "y1", "x2", "y2", "score", "thing","dummy_id"]
+    csv_writer = csv.DictWriter(csv_file_handle, fieldnames=col_names)
+    csv_writer.writeheader()
+
     # Select random images to visualize and save the prediction results:
-    all_test_preds = []
+    # TODO: Save a random set of frames, but run prediction on all of them.
     for i,d in enumerate(random.sample(datasets, number_of_imgs)):
 
         print(f"Predicting on image {i+1} of {number_of_imgs} ...")
-        
+
         id = d["image_id"]
         img = cv2.imread(d["file_name"])
         detected = predictor(img)
@@ -82,8 +92,7 @@ def main(config):
 
         cv2.imwrite(join(model_root, "test_pred_imgs", ("predicted_" + basename(d["file_name"]))), pred_img)
 
-        # Save the predicted box coords and scores to a dictionary:
-        test_preds = {}
+        # Stream the predicted box coords and scores to a csv:
         preds = detected['instances'].to('cpu')
         boxes = preds.pred_boxes
         thing_ids = preds.pred_classes.tolist()
@@ -96,18 +105,12 @@ def main(config):
             score = float(scores[i].numpy())
             thing_id = thing_ids[i] # is int
             thing_class = metadata.thing_classes[thing_id]
-            all_boxes.append([int(coords[0][0]), # x1
-                              int(coords[0][1]), # y1
-                              int(coords[0][2]), # x2
-                              int(coords[0][3]), # y2
-                              score,
-                              thing_class])
-        test_preds[d["file_name"]] = all_boxes
 
-        all_test_preds.append(test_preds)
-
-    # Write the dictionary to a json:
-    output_json = join(model_root, "all_test_preds.json")
-    with open(output_json, "w") as f:
-        json.dump(all_test_preds, f)
-    print(f"Saved test predictions to {output_json}")
+            csv_writer.writerow({col_names[0]: basename(d["file_name"]),
+                                 col_names[1]: int(coords[0][0]), # x1
+                                 col_names[2]: int(coords[0][1]), # y1
+                                 col_names[3]: int(coords[0][2]), # x2
+                                 col_names[4]: int(coords[0][3]), # y2
+                                 col_names[5]: score, # score
+                                 col_names[6]: thing_class, # thing
+                                 col_names[7]: i})# dummy id
