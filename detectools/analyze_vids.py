@@ -21,7 +21,7 @@ def main(config):
     model_root = expanduser(config["base"]["model_root"])
 
     model_pth = expanduser(config["analyze_vids"]["model_pth"])
-    testing_thresh = float(config["analyze_vids"]["testing_thresh"])
+    score_cutoff = float(config["analyze_vids"]["score_cutoff"])
     vids_root = expanduser(config["analyze_vids"]["vids_root"])
     framerate = int(config["analyze_vids"]["framerate"])
 
@@ -30,17 +30,20 @@ def main(config):
     if model_pth not in model_root:
         raise IOError(f"The selected model, {basename(model_pth)}, is not in "
                       f"{basename(model_root)}. Please pick a model that resides")
-    if not 0 < testing_thresh < 1:
-        raise ValueError(f"The testing threshold, {testing_thresh}, must be between 0 and 1.")
+    if not 0 < score_cutoff < 1:
+        raise ValueError(f"The testing threshold, {score_cutoff}, must be between 0 and 1.")
 
     vids = [str(path.absolute()) for path in Path(vids_root).rglob("*.h264")]
 
     register_data(json_root, imgs_root)
 
-    # Need this datasets line, in order for metadata to have .thing_classes attribute
-    # TODO!!!!!!!!!!!: User needs to specify the data of interest, not the training data lol
+    # Need the `datasets =` line, in order for metadata to have the 
+    # .thing_classes attrib. I don't really use these two lines, I 
+    # only call them so I can get the .thing_classes attrib off 
+    # `metadata`. So, it doesn't matter if I use "training_data" as 
+    # my arg or some other registered dataset, for these two calls:
     datasets = DatasetCatalog.get("training_data") 
-    metadata = MetadataCatalog.get("training_data") # don't need to eval this time
+    metadata = MetadataCatalog.get("training_data")
 
     # Read the cfg back in:
     with open(join(model_root, "cfg.txt"), "r") as f:
@@ -50,7 +53,8 @@ def main(config):
 
     # Use the weights from our chosen model:
     cfg.MODEL.WEIGHTS = model_pth
-    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = testing_thresh
+    # Pick a confidence cutoff based on PR curve
+    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = score_cutoff
 
     print("Generating predictor ...")
     predictor = DefaultPredictor(cfg)
