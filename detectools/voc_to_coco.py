@@ -162,7 +162,7 @@ def main(config):
     train_frac = config["voc_to_coco"]["train_frac"]
 
     jsons_dir = join(root, "jsons")
-    os.makedirs(jsons_dir, exist_ok=True) # will overwrite
+    os.makedirs(jsons_dir, exist_ok=False) 
 
     labels_and_ids = make_ids_from_labels(labels=labels)
     
