@@ -1,5 +1,6 @@
 from os.path import expanduser, join, basename, dirname, splitext
 from pathlib import Path
+import json
 
 import numpy as np
 import cv2
@@ -53,11 +54,12 @@ def main(config):
     predictor = DefaultPredictor(cfg)
 
     for vid in vids:
-
+        
         cap = cv2.VideoCapture(vid)
         frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         pbar = trange(frame_count)
-        output_vid = f"{splitext(vid)[0]}.mp4"
+        output_vid = f"{splitext(vid)[0]}_detected.mp4"
+        output_json = f"{splitext(vid)[0]}_detected.json"
 
         # Define the codec and create VideoWriter object
         fourcc = cv2.VideoWriter_fourcc(*"mp4v") 
@@ -68,11 +70,55 @@ def main(config):
                                 frameSize=(int(cap.get(3)), int(cap.get(4))), 
                                 params=None)
 
+        # Use Detectron2 model on each frame in vid:
+        all_detection_info = []
         for f,_ in enumerate(pbar):
 
             ret, frame = cap.read()
 
             if ret:
 
-                pass
-                # TODO: write body
+                detected = predictor(frame)
+                
+                # Visualize:
+                visualizer = Visualizer(frame[:, :, ::-1], 
+                                        metadata=metadata,
+                                        scale=1.0, 
+                                        instance_mode=ColorMode)
+                visualizer = visualizer.draw_instance_predictions(detected["instances"].to("cpu"))      
+                detected_img = visualizer.get_image()[:, :, ::-1]
+
+                # Save frame to vid:
+                out.write(detected_img)
+
+                # Save the predicted box coords and scores to a dictionary:
+                detection_info = {}
+                preds = detected['instances'].to('cpu')
+                boxes = preds.pred_boxes
+                thing_ids = preds.pred_classes.tolist()
+                scores = preds.scores
+                num_boxes = np.array(scores.size())[0]
+                all_boxes = []
+
+                for i in range(0, num_boxes):
+                    coords = boxes[i].tensor.numpy()    	
+                    score = float(scores[i].numpy())
+                    thing_id = thing_ids[i] # is int
+                    thing_class = metadata.thing_classes[thing_id]
+                    all_boxes.append([int(coords[0][0]), # x1
+                                    int(coords[0][1]), # y1
+                                    int(coords[0][2]), # x2
+                                    int(coords[0][3]), # y2
+                                    score,
+                                    thing_class])
+                detection_info[f"frame_{f:06d}"] = all_boxes
+
+                all_detection_info.append(detection_info)
+
+                pbar.set_description(f"Detecting {len(thing_ids)} objects "
+                                     f"in frame {f+1}/{frame_count}")
+
+        # Write the dictionary to a json:
+        with open(output_json, "w") as f:
+            json.dump(all_detection_info, f)
+        print(f"Saved test predictions to {output_json}")
