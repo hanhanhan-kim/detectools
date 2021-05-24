@@ -44,7 +44,8 @@ def main(config):
     predictor = DefaultPredictor(cfg)
 
     # For saving images with predicted labels:
-    makedirs(join(model_root, "test_pred_imgs"), exist_ok=True)
+    output_imgs_dir = join(model_root, "test_pred_imgs")
+    makedirs(output_imgs_dir, exist_ok=True)
 
     # For saving detection predictions as csv:
     output_csv = join(model_root, "all_test_preds.csv")
@@ -77,7 +78,7 @@ def main(config):
         # Save the first 5 images from the random draw:
         if i in rando_idxs:
             pred_img = visualizer.get_image()[:, :, ::-1]
-            cv2.imwrite(join(model_root, "test_pred_imgs", ("predicted_" + basename(d["file_name"]))), pred_img)
+            cv2.imwrite(join(output_imgs_dir, ("predicted_" + basename(d["file_name"]))), pred_img)
 
         if do_show:
 
@@ -115,3 +116,4 @@ def main(config):
 
     print(f"Finished evaluating all {len(datasets)} images from the test data fraction.")
     print(f"Results are stored in {output_csv}")
+    print(f"5 sample test images are stored in {output_imgs_dir}")
