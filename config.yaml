@@ -24,7 +24,13 @@ train_model:
   # TODO: param for BATCH_SIZE_PER_IMAGE?
 
 eval_model:
-  testing_thresh: 0.5 # set the testing threshold for this model
+  testing_thresh: 0.5 # should be low for eval
   number_of_imgs: 5
   scale: 1.0
   do_show: false
+
+analyze_vids:
+  model_pth: 
+  testing_thresh: 0.8 # should be high for inference on actual videos
+  vids_root: 
+  framerate: 

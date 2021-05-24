@@ -41,7 +41,7 @@ def main(config):
 
     # Use the weights from the model trained on our custom dataset:
     cfg.MODEL.WEIGHTS = join(model_root, "model_final.pth")
-    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = testing_thresh   
+    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = testing_thresh
     # cfg.DATASETS.TEST = ("val_data", ) # should already be saved from train_model.py
 
     print("Generating predictor ...")

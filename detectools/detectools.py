@@ -73,6 +73,13 @@ def eval_model(config):
     click.echo("\nEvaluating model ...")
     eval_model.main(config)
 
+@cli.command()
+@pass_config
+def analyze_vids(config):
+    from detectools import analyze_vids
+    click.echo("\nAnalyzing videos ...")
+    analyze_vids.main(config)
+
 
 if __name__ == "__main__":
     cli()
