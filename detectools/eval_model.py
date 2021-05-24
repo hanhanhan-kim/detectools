@@ -55,14 +55,14 @@ def main(config):
 
         id = d["image_id"]
         img = cv2.imread(d["file_name"])
-        outputs = predictor(img)
+        detected = predictor(img)
         
         # Visualize:
         visualizer = Visualizer(img[:, :, ::-1], 
                                 metadata=metadata, 
                                 scale=scale, 
                                 instance_mode=ColorMode)
-        visualizer = visualizer.draw_instance_predictions(outputs["instances"].to("cpu"))        
+        visualizer = visualizer.draw_instance_predictions(detected["instances"].to("cpu"))        
         pred_img = visualizer.get_image()[:, :, ::-1]
 
         if do_show:
@@ -81,7 +81,7 @@ def main(config):
 
         # Save the predicted box coords and scores to a dictionary:
         test_preds = {}
-        preds = outputs['instances'].to('cpu')
+        preds = detected['instances'].to('cpu')
         boxes = preds.pred_boxes
         thing_ids = preds.pred_classes.tolist()
         scores = preds.scores
