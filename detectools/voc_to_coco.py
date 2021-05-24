@@ -3,7 +3,7 @@ Modified from https://github.com/yukkyo/voc2coco
 """
 
 import os
-from os.path import basename, expanduser, dirname
+from os.path import basename, expanduser, dirname, join
 from pathlib import Path
 import json
 import random
@@ -132,40 +132,48 @@ def convert_xmls_to_cocojson(ann_paths: List[str],
         f.write(output_json)
 
 
-def split_into_train_and_val(ann_paths, output_dir: str, train_frac:float=0.75):
+def split_data(ann_paths, output_dir: str, train_frac:float=0.8):
 
-    """Split the list of annotation paths into train and val lists""" 
+    """Split the list of annotation paths into train, val, and test lists""" 
 
     if not Path(output_dir).is_dir():
         raise IOError(f"{basename(output_dir)} must be a directory.")
     if train_frac <= 0 and train_frac >= 1:
-        raise ValueError(f"train_frac {train_frac} is not between 0 and 1.")
+        raise ValueError(f"train_frac, {train_frac}, is not between 0 and 1.")
 
+    # The split is train:val:test
+    val_or_test_frac = 1 - train_frac
     random.shuffle(ann_paths) # Shuffles in place
-    border = int(train_frac * len(ann_paths))
-    train_ann_paths = ann_paths[:border]
-    val_ann_paths = ann_paths[border:]
+    border_bw_train_val = int(train_frac * len(ann_paths))
+    border_bw_val_test = int(border_bw_train_val + val_or_test_frac * len(ann_paths))
 
-    return train_ann_paths, val_ann_paths
+    train_ann_paths = ann_paths[:border_bw_train_val]
+    val_ann_paths = ann_paths[border_bw_train_val:border_bw_val_test]
+    test_ann_paths = ann_paths[border_bw_val_test:]
+
+    return train_ann_paths, val_ann_paths, test_ann_paths
 
 
 def main(config):
 
+    root = expanduser(config["base"]["root"])
     ann_root = expanduser(config["voc_to_coco"]["ann_root"])
     labels = config["voc_to_coco"]["labels"]
-    json_root = expanduser(config["base"]["json_root"]) # output dir
     train_frac = config["voc_to_coco"]["train_frac"]
+
+    jsons_dir = join(root, "jsons")
+    os.makedirs(jsons_dir)
 
     labels_and_ids = make_ids_from_labels(labels=labels)
     
     all_ann_paths = get_ann_paths(ann_root=ann_root)
-    train_ann_paths, val_ann_paths = split_into_train_and_val(ann_paths=all_ann_paths, 
-                                                              output_dir=json_root, 
-                                                              train_frac=train_frac)
-    all_paths = [all_ann_paths, train_ann_paths, val_ann_paths]
+    train_ann_paths, val_ann_paths, test_ann_paths = split_data(ann_paths=all_ann_paths, 
+                                                                output_dir=jsons_dir, 
+                                                                train_frac=train_frac)
+    all_paths = [all_ann_paths, train_ann_paths, val_ann_paths, test_ann_paths]
 
-    output_jsons = ["all.json", "train.json", "val.json"]
-    output_jsons = [os.path.join(json_root, json) for json in output_jsons]
+    output_jsons = ["all.json", "train.json", "val.json", "test.json"]
+    output_jsons = [join(jsons_dir, json) for json in output_jsons]
 
 
     for paths, output_json, in zip(all_paths, output_jsons):
