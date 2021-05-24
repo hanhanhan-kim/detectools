@@ -142,7 +142,7 @@ def split_data(ann_paths, output_dir: str, train_frac:float=0.8):
         raise ValueError(f"train_frac, {train_frac}, is not between 0 and 1.")
 
     # The split is train:val:test
-    val_or_test_frac = 1 - train_frac
+    val_or_test_frac = (1 - train_frac) / 2
     random.shuffle(ann_paths) # Shuffles in place
     border_bw_train_val = int(train_frac * len(ann_paths))
     border_bw_val_test = int(border_bw_train_val + val_or_test_frac * len(ann_paths))
@@ -150,6 +150,8 @@ def split_data(ann_paths, output_dir: str, train_frac:float=0.8):
     train_ann_paths = ann_paths[:border_bw_train_val]
     val_ann_paths = ann_paths[border_bw_train_val:border_bw_val_test]
     test_ann_paths = ann_paths[border_bw_val_test:]
+
+    import ipdb; ipdb.set_trace()
 
     return train_ann_paths, val_ann_paths, test_ann_paths
 
