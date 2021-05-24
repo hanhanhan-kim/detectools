@@ -1,10 +1,11 @@
 from os.path import expanduser, join, basename, dirname, splitext
 from pathlib import Path
-import json
+import csv
+import atexit
 
 import numpy as np
 import cv2
-from tqdm import tqdm, trange
+from tqdm import trange
 from detectron2.engine import DefaultPredictor
 from detectron2.config import CfgNode
 from detectron2.utils.visualizer import ColorMode, Visualizer
@@ -37,6 +38,7 @@ def main(config):
     register_data(json_root, imgs_root)
 
     # Need this datasets line, in order for metadata to have .thing_classes attribute
+    # TODO!!!!!!!!!!!: User needs to specify the data of interest, not the training data lol
     datasets = DatasetCatalog.get("training_data") 
     metadata = MetadataCatalog.get("training_data") # don't need to eval this time
 
@@ -59,7 +61,13 @@ def main(config):
         frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         pbar = trange(frame_count)
         output_vid = f"{splitext(vid)[0]}_detected.mp4"
-        output_json = f"{splitext(vid)[0]}_detected.json"
+
+        output_csv = f"{splitext(vid)[0]}_detected.csv"
+        csv_file_handle = open(output_csv, "w", newline="")
+        atexit.register(csv_file_handle.close) 
+        col_names = ["frame", "x1", "y1", "x2", "y2", "score", "thing", "dummy_id"]
+        csv_writer = csv.DictWriter(csv_file_handle, fieldnames=col_names)
+        csv_writer.writeheader()
 
         # Define the codec and create VideoWriter object
         fourcc = cv2.VideoWriter_fourcc(*"mp4v") 
@@ -92,33 +100,26 @@ def main(config):
                 out.write(detected_img)
 
                 # Save the predicted box coords and scores to a dictionary:
-                detection_info = {}
                 preds = detected['instances'].to('cpu')
                 boxes = preds.pred_boxes
                 thing_ids = preds.pred_classes.tolist()
                 scores = preds.scores
                 num_boxes = np.array(scores.size())[0]
-                all_boxes = []
 
                 for i in range(0, num_boxes):
                     coords = boxes[i].tensor.numpy()    	
                     score = float(scores[i].numpy())
                     thing_id = thing_ids[i] # is int
                     thing_class = metadata.thing_classes[thing_id]
-                    all_boxes.append([int(coords[0][0]), # x1
-                                    int(coords[0][1]), # y1
-                                    int(coords[0][2]), # x2
-                                    int(coords[0][3]), # y2
-                                    score,
-                                    thing_class])
-                detection_info[f"frame_{f:06d}"] = all_boxes
 
-                all_detection_info.append(detection_info)
+                    csv_writer.writerow({col_names[0]: int(f), # frame
+                                         col_names[1]: int(coords[0][0]), # x1
+                                         col_names[2]: int(coords[0][1]), # y1
+                                         col_names[3]: int(coords[0][2]), # x2
+                                         col_names[4]: int(coords[0][3]), # y2
+                                         col_names[5]: score, # score
+                                         col_names[6]: thing_class, # thing
+                                         col_names[7]: i}) # dummy id
 
                 pbar.set_description(f"Detecting {len(thing_ids)} objects "
                                      f"in frame {f+1}/{frame_count}")
-
-        # Write the dictionary to a json:
-        with open(output_json, "w") as f:
-            json.dump(all_detection_info, f)
-        print(f"Saved test predictions to {output_json}")
