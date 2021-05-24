@@ -20,20 +20,15 @@ def main(config):
     imgs_root = expanduser(config["base"]["imgs_root"])
     model_root = expanduser(config["base"]["model_root"])
 
-    testing_thresh = float(config["eval_model"]["testing_thresh"])
     scale = float(config["eval_model"]["scale"])
     number_of_imgs = int(config["eval_model"]["number_of_imgs"])
     do_show = config["eval_model"]["do_show"]
 
-    if not 0 < testing_thresh < 1:
-        raise ValueError(f"The testing threshold, {testing_thresh}, must be between 0 and 1.")
-
     register_data(json_root, imgs_root)
 
     # Need this datasets line, in order for metadata to have .thing_classes attribute
-    # TODO: Use val data from val.json instead! Use all of it.
-    datasets = DatasetCatalog.get("training_data") # TODO!!!!!!!!!!!!!!
-    metadata = MetadataCatalog.get("training_data").set(evaluator_type="coco")
+    datasets = DatasetCatalog.get("val_data") 
+    metadata = MetadataCatalog.get("val_data").set(evaluator_type="coco")
     
     # Read the cfg back in:
     with open(join(model_root, "cfg.txt"), "r") as f:
@@ -43,7 +38,7 @@ def main(config):
 
     # Use the weights from the model trained on our custom dataset:
     cfg.MODEL.WEIGHTS = join(model_root, "model_final.pth")
-    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = testing_thresh
+    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.01 # make small so I can make PR curve for broad range of scores
     # cfg.DATASETS.TEST = ("val_data", ) # should already be saved from train_model.py
 
     print("Generating predictor ...")
@@ -61,7 +56,7 @@ def main(config):
     csv_writer.writeheader()
 
     # Select random images to visualize and save the prediction results:
-    # TODO: Save a random set of frames, but run prediction on all of them.
+    # TODO!!!!!!!!!!!: Save a random set of frames, but run prediction on ALL of them.
     for i,d in enumerate(random.sample(datasets, number_of_imgs)):
 
         print(f"Predicting on image {i+1} of {number_of_imgs} ...")
@@ -98,7 +93,6 @@ def main(config):
         thing_ids = preds.pred_classes.tolist()
         scores = preds.scores
         num_boxes = np.array(scores.size())[0]
-        all_boxes = []
 
         for i in range(0, num_boxes):
             coords = boxes[i].tensor.numpy()    	
@@ -113,4 +107,4 @@ def main(config):
                                  col_names[4]: int(coords[0][3]), # y2
                                  col_names[5]: score, # score
                                  col_names[6]: thing_class, # thing
-                                 col_names[7]: i})# dummy id
+                                 col_names[7]: i}) # dummy id
