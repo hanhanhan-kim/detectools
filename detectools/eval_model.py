@@ -21,14 +21,13 @@ def main(config):
     model_root = expanduser(config["base"]["model_root"])
 
     scale = float(config["eval_model"]["scale"])
-    number_of_imgs = int(config["eval_model"]["number_of_imgs"])
     do_show = config["eval_model"]["do_show"]
 
     register_data(json_root, imgs_root)
 
     # Need this datasets line, in order for metadata to have .thing_classes attribute
-    datasets = DatasetCatalog.get("val_data") 
-    metadata = MetadataCatalog.get("val_data").set(evaluator_type="coco")
+    datasets = DatasetCatalog.get("test_data") 
+    metadata = MetadataCatalog.get("test_data")
     
     # Read the cfg back in:
     with open(join(model_root, "cfg.txt"), "r") as f:
@@ -55,11 +54,14 @@ def main(config):
     csv_writer = csv.DictWriter(csv_file_handle, fieldnames=col_names)
     csv_writer.writeheader()
 
-    # Select random images to visualize and save the prediction results:
-    # TODO!!!!!!!!!!!: Save a random set of frames, but run prediction on ALL of them.
-    for i,d in enumerate(random.sample(datasets, number_of_imgs)):
+    # Select 5 random images to visualize, 
+    # but save the prediction results for all imgs:
+    rando_idxs = np.random.choice(range(len(datasets)), 5, replace=False).tolist()
+    for i,d in enumerate(datasets):
 
-        print(f"Predicting on image {i+1} of {number_of_imgs} ...")
+        # import ipdb; ipdb.set_trace()
+
+        print(f"Predicting on image {i+1} of {len(datasets)} ...", end="\r")
 
         id = d["image_id"]
         img = cv2.imread(d["file_name"])
@@ -71,12 +73,16 @@ def main(config):
                                 scale=scale, 
                                 instance_mode=ColorMode)
         visualizer = visualizer.draw_instance_predictions(detected["instances"].to("cpu"))        
-        pred_img = visualizer.get_image()[:, :, ::-1]
+        
+        # Save the first 5 images from the random draw:
+        if i in rando_idxs:
+            pred_img = visualizer.get_image()[:, :, ::-1]
+            cv2.imwrite(join(model_root, "test_pred_imgs", ("predicted_" + basename(d["file_name"]))), pred_img)
 
         if do_show:
 
             cv2.imshow(f"prediction on image {id}", pred_img)
-            print(f"Press any key to go to the next image ({i+1}/{number_of_imgs}) ...")
+            print(f"Press any key to go to the next image ({i+1}/5) ...")
 
             key = cv2.waitKey(0) & 0xFF
             if key == ord("q"):
@@ -84,8 +90,6 @@ def main(config):
                 break
 
         cv2.destroyAllWindows()
-
-        cv2.imwrite(join(model_root, "test_pred_imgs", ("predicted_" + basename(d["file_name"]))), pred_img)
 
         # Stream the predicted box coords and scores to a csv:
         preds = detected['instances'].to('cpu')
@@ -108,3 +112,6 @@ def main(config):
                                  col_names[5]: score, # score
                                  col_names[6]: thing_class, # thing
                                  col_names[7]: i}) # dummy id
+
+    print(f"Finished evaluating all {len(datasets)} images from the test data fraction.")
+    print(f"Results are stored in {output_csv}")

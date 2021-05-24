@@ -37,3 +37,7 @@ def register_data(json_dir, imgs_root):
                             {}, 
                             path_join(json_dir, "val.json"), 
                             imgs_root)
+    register_coco_instances("test_data", 
+                            {}, 
+                            path_join(json_dir, "test.json"), 
+                            imgs_root)
