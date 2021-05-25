@@ -1,5 +1,4 @@
-from os.path import expanduser, basename
-from os.path import join as path_join
+from os.path import expanduser, basename, join
 from pathlib import Path
 
 from detectron2.data.datasets import register_coco_instances
@@ -31,13 +30,13 @@ def register_data(json_dir, imgs_root):
 
     register_coco_instances("training_data", 
                         {}, 
-                        path_join(json_dir, "train.json"), 
+                        join(json_dir, "train.json"), 
                         imgs_root) 
     register_coco_instances("val_data", 
                             {}, 
-                            path_join(json_dir, "val.json"), 
+                            join(json_dir, "val.json"), 
                             imgs_root)
     register_coco_instances("test_data", 
                             {}, 
-                            path_join(json_dir, "test.json"), 
+                            join(json_dir, "test.json"), 
                             imgs_root)

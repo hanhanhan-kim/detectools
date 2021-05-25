@@ -1,4 +1,5 @@
 from os.path import expanduser, join, basename, dirname, splitext
+from os import makedirs
 from pathlib import Path
 import csv
 import atexit
@@ -18,8 +19,8 @@ def main(config):
 
     root = expanduser(config["base"]["root"])
     imgs_root = expanduser(config["base"]["imgs_root"])
-    model_root = expanduser(config["base"]["model_root"])
     jsons_dir = join(root, "jsons")
+    model_dir = join(root, "outputs")
 
     model_pth = expanduser(config["analyze_vids"]["model_pth"])
     score_cutoff = float(config["analyze_vids"]["score_cutoff"])
@@ -28,9 +29,9 @@ def main(config):
 
     if not model_pth.endswith(".pth"):
         raise ValueError(f"{basename(model_pth)} must be a '.pth' file.")
-    if model_pth not in model_root:
+    if model_pth not in model_dir:
         raise IOError(f"The selected model, {basename(model_pth)}, is not in "
-                      f"{basename(model_root)}. Please pick a model that resides")
+                      f"{basename(model_dir)}. Please pick a model that resides")
     if not 0 < score_cutoff < 1:
         raise ValueError(f"The testing threshold, {score_cutoff}, must be between 0 and 1.")
 
@@ -47,7 +48,7 @@ def main(config):
     metadata = MetadataCatalog.get("training_data")
 
     # Read the cfg back in:
-    with open(join(model_root, "cfg.txt"), "r") as f:
+    with open(join(model_dir, "cfg.txt"), "r") as f:
         cfg = f.read()
     # Turn into CfgNode obj:
     cfg = CfgNode.load_cfg(cfg) 

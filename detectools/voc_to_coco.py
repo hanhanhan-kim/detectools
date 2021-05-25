@@ -151,8 +151,6 @@ def split_data(ann_paths, output_dir: str, train_frac:float=0.8):
     val_ann_paths = ann_paths[border_bw_train_val:border_bw_val_test]
     test_ann_paths = ann_paths[border_bw_val_test:]
 
-    import ipdb; ipdb.set_trace()
-
     return train_ann_paths, val_ann_paths, test_ann_paths
 
 

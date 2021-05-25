@@ -18,8 +18,8 @@ def main(config):
 
     root = expanduser(config["base"]["root"])
     imgs_root = expanduser(config["base"]["imgs_root"])
-    model_root = expanduser(config["base"]["model_root"])
     jsons_dir = join(root, "jsons")
+    model_dir = join(root, "outputs")
 
     scale = float(config["eval_model"]["scale"])
     do_show = config["eval_model"]["do_show"]
@@ -31,13 +31,13 @@ def main(config):
     metadata = MetadataCatalog.get("test_data")
     
     # Read the cfg back in:
-    with open(join(model_root, "cfg.txt"), "r") as f:
+    with open(join(model_dir, "cfg.txt"), "r") as f:
         cfg = f.read()
     # Turn into CfgNode obj:
     cfg = CfgNode.load_cfg(cfg) 
 
     # Use the weights from the model trained on our custom dataset:
-    cfg.MODEL.WEIGHTS = join(model_root, "model_final.pth")
+    cfg.MODEL.WEIGHTS = join(model_dir, "model_final.pth")
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.01 # make small so I can make PR curve for broad range of scores
     # cfg.DATASETS.TEST = ("val_data", ) # should already be saved from train_model.py
 
@@ -45,11 +45,11 @@ def main(config):
     predictor = DefaultPredictor(cfg)
 
     # For saving images with predicted labels:
-    output_imgs_dir = join(model_root, "test_pred_imgs")
+    output_imgs_dir = join(model_dir, "test_pred_imgs")
     makedirs(output_imgs_dir, exist_ok=True)
 
     # For saving detection predictions as csv:
-    output_csv = join(model_root, "all_test_preds.csv")
+    output_csv = join(model_dir, "all_test_preds.csv")
     csv_file_handle = open(output_csv, "w", newline="")
     atexit.register(csv_file_handle.close) 
     col_names = ["img", "x1", "y1", "x2", "y2", "score", "thing","dummy_id"]
@@ -117,4 +117,4 @@ def main(config):
 
     print(f"Finished evaluating all {len(datasets)} images from the test data fraction.")
     print(f"Results are stored in {output_csv}")
-    print(f"5 sample test images are stored in {output_imgs_dir}")
+    print(f"5 sample test images are stored in {output_imgs_dir} \n")

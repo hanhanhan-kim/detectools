@@ -1,5 +1,5 @@
 from pathlib import Path
-from os.path import expanduser
+from os.path import expanduser, join
 from pprint import pprint
 import subprocess
 
@@ -62,8 +62,9 @@ def train_model(config):
 @cli.command()
 @pass_config
 def see_tensorboard(config):
-    model = expanduser(config["base"]["model_root"])
-    subprocess.run(["tensorboard", "--logdir", model])
+    root = expanduser(config["base"]["root"])
+    model_dir = join(root, "outputs")
+    subprocess.run(["tensorboard", "--logdir", model_dir])
     # TODO: Have it open http://localhost:6006/ (Press CTRL+C to quit)
 
 @cli.command()

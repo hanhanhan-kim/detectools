@@ -17,13 +17,14 @@ def main(config):
     root = expanduser(config["base"]["root"])
     imgs_root = expanduser(config["base"]["imgs_root"])
     jsons_dir = join(root, "jsons")
+    model_dir = join(root, "outputs")
+    makedirs(model_dir, exist_ok=False)
 
     learning_rate = float(config["train_model"]["learning_rate"])
     lr_decay_policy = config["train_model"]["lr_decay_policy"]
     max_iter = int(config["train_model"]["max_iter"])
     eval_period = int(config["train_model"]["eval_period"])
     checkpoint_period = int(config["train_model"]["checkpoint_period"])
-    model_root = expanduser(config["base"]["model_root"])
 
     if not 0 < learning_rate < 1:
         raise ValueError(f"The learning rate, {learning_rate}, must be between 0 and 1.")
@@ -63,10 +64,10 @@ def main(config):
     cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = (128)  # faster, and good enough for this toy dataset; default is 512
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = len(metadata.thing_classes)  # refers to number of classes, e.g. labels. E.g. WBC, RBC, platelet
 
-    cfg.OUTPUT_DIR = model_root
+    cfg.OUTPUT_DIR = model_dir
 
     # Save settings for later; write the string rep of cfg:
-    with open(join(model_root, "cfg.txt"), "w") as f:
+    with open(join(model_dir, "cfg.txt"), "w") as f:
         f.write(cfg.dump())
     
     # Train the model with the above settings!:
@@ -75,4 +76,5 @@ def main(config):
     trainer.resume_or_load(resume=False)
     trainer.train()
 
+    print(f"All results are stored in {model_dir}\n")
     # TODO: Say in docs that I only support coco
