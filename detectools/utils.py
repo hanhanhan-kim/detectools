@@ -20,7 +20,7 @@ def register_data(json_dir, imgs_root):
     Void. Just registers the data.     
     """
 
-    json_dir = expanduser(json_dir)
+    json_dir = expanduser(json_dir) # json_dir = expanduser(config["voc_to_coco"]["output_dir"])
     imgs_root = expanduser(imgs_root)
 
     if not Path(json_dir).is_dir():

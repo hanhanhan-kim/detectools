@@ -1,7 +1,6 @@
 from os import makedirs
 from os.path import expanduser
 from os.path import join 
-from pathlib import Path
 
 from detectron2 import model_zoo
 from detectron2.config import get_cfg
@@ -17,13 +16,6 @@ def main(config):
 
     root = expanduser(config["base"]["root"])
     imgs_root = expanduser(config["base"]["imgs_root"])
-
-    collated_dir = join(root, "collated")
-    if Path(collated_dir).is_dir():
-        print(f"The `collated/` directory exists." 
-              "Will use images and .xmls from the `collated/` directory.")
-        imgs_root =  join(collated_dir, "frames")
-
     jsons_dir = join(root, "jsons")
     model_dir = join(root, "outputs")
     makedirs(model_dir, exist_ok=False)

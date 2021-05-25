@@ -169,6 +169,10 @@ def main(config):
 
     labels_and_ids = make_ids_from_labels(labels=labels)
     
+    # TODO: MAKE OPTIONAL:
+    # sort xmls and jpgs, then zip add unique ids
+    # COPY to a new dir called collated, a subidr of root
+
     # This option will flatten the tree for imgs and xmls found in nested directories:
     if do_collate:
         

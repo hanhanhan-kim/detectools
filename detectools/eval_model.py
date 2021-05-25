@@ -1,4 +1,4 @@
-from pathlib import Path
+import random
 from os.path import expanduser, join, basename
 from os import makedirs
 import csv
@@ -18,13 +18,6 @@ def main(config):
 
     root = expanduser(config["base"]["root"])
     imgs_root = expanduser(config["base"]["imgs_root"])
-
-    collated_dir = join(root, "collated")
-    if Path(collated_dir).is_dir():
-        print(f"The `collated/` directory exists." 
-              "Will use images and .xmls from the `collated/` directory.")
-        imgs_root =  join(collated_dir, "frames")
-
     jsons_dir = join(root, "jsons")
     model_dir = join(root, "outputs")
 
