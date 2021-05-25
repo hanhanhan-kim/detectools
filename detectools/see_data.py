@@ -1,5 +1,6 @@
 import random
-from os.path import expanduser, join
+from os.path import expanduser, join, basename
+from pathlib import Path
 
 import cv2
 from detectron2.utils.visualizer import Visualizer
@@ -12,6 +13,13 @@ def main(config):
     
     root = expanduser(config["base"]["root"])
     imgs_root = expanduser(config["base"]["imgs_root"])
+
+    collated_dir = join(root, "collated")
+    if Path(collated_dir).is_dir():
+        print(f"The `collated` directory exists. " 
+              "Will use images and .xmls from the `collated` directory.")
+        imgs_root =  join(collated_dir, "frames")
+
     scale = float(config["see_data"]["scale"])
     number_of_imgs = int(config["see_data"]["number_of_imgs"])
     jsons_dir = join(root, "jsons")
@@ -27,6 +35,8 @@ def main(config):
 
         id = d["image_id"]
         img = cv2.imread(d["file_name"])
+
+        import ipdb; ipdb.set_trace()
 
         visualizer = Visualizer(img[:, :, ::-1], 
                                 metadata=metadata, 

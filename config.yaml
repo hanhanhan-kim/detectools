@@ -6,12 +6,11 @@ base:
   root:  ~/src/voc2coco/sample
   imgs_root:  ~/src/voc2coco/JPEGImages # original imgs
   do_collate: true # false 
-  # TODO: if do_collate, then the imgs_root and ann_root will be in
+  # If do_collate, then the imgs_root and ann_root will be in
   # diff places from where they were originally. I would need to 
   # do a cond or a try except block: I'd have to check that the `collated/` dir
   # exists, and if so I use the collated (collated should always take precedence).
   # otherwise, i should just use the input imgs_root and ann_root
-  # I should do that in a fxn that I put in utils.py
 
 voc_to_coco:
   ann_root: ~/src/voc2coco/sample/Annotations
