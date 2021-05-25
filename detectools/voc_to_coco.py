@@ -228,7 +228,7 @@ def main(config):
     print(f"All .json files have been written to {jsons_dir}")
 
     if do_collate:
-        print(f"All collated .xml and image files have been written to {collated_dir}")
+        print(f"All collated .xml and image files have been copied to {collated_dir}")
 
 if __name__ == '__main__':
     main()
