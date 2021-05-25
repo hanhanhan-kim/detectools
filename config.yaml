@@ -1,8 +1,17 @@
 # For toy data:
 
+# TODO: Talk about how the imgs in imgs_root and the anns in ann_root can't
+# be nested; the imgs and xmls need to be directly in those dirs
 base:
   root:  ~/src/voc2coco/sample
   imgs_root:  ~/src/voc2coco/JPEGImages # original imgs
+  do_collate: true # false 
+  # TODO: if do_collate, then the imgs_root and ann_root will be in
+  # diff places from where they were originally. I would need to 
+  # do a cond or a try except block: I'd have to check that the `collated/` dir
+  # exists, and if so I use the collated (collated should always take precedence).
+  # otherwise, i should just use the input imgs_root and ann_root
+  # I should do that in a fxn that I put in utils.py
 
 voc_to_coco:
   ann_root: ~/src/voc2coco/sample/Annotations
@@ -27,7 +36,41 @@ eval_model:
   do_show: false
 
 analyze_vids:
-  model_pth: 
+  model_pth: # path to desired model .pth file
   score_cutoff: 0.8 # should be high for inference on actual videos
   vids_root: 
   framerate: 
+
+#---------------------------------------------
+
+# base:
+#   root:  ~/Dropbox/_mysci/models/detectron2/cashy
+#   imgs_root:  ~/src/voc2coco/JPEGImages # original imgs
+
+# voc_to_coco:
+#   ann_root: ~/src/voc2coco/sample/Annotations
+#   labels: ["RBC", "WBC", "Platelets"]
+#   train_frac: 0.75
+  
+# see_data:
+#   number_of_imgs: 5
+#   scale: 1.0
+
+# # TODO: Just mention this warning in the README: https://github.com/facebookresearch/detectron2/issues/196
+# train_model:
+#   learning_rate: 0.02 # Pick a good learning rate
+#   lr_decay_policy: [] # Each element in this list states the iteration no. at which the LR will decay by a factor of 10. If empty, the LR will not decay.
+#   max_iter: 300 # Max number of iterations
+#   eval_period: 100 # will do an evluation once every this many iters on cfg.DATASETS.TEST
+#   checkpoint_period: 100 # will save the model .pth this many iterations; doesn't make sense for this val to be smaller than eval_period
+#   # TODO: param for BATCH_SIZE_PER_IMAGE?
+
+# eval_model:
+#   scale: 1.0
+#   do_show: false
+
+# analyze_vids:
+#   model_pth: # path to desired model .pth file
+#   score_cutoff: 0.8 # should be high for inference on actual videos
+#   vids_root: 
+#   framerate: 

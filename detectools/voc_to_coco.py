@@ -3,8 +3,9 @@ Modified from https://github.com/yukkyo/voc2coco
 """
 
 import os
-from os.path import basename, expanduser, dirname, join
+from os.path import basename, expanduser, join, splitext
 from pathlib import Path
+import shutil
 import json
 import random
 import xml.etree.ElementTree as ET
@@ -157,6 +158,8 @@ def split_data(ann_paths, output_dir: str, train_frac:float=0.8):
 def main(config):
 
     root = expanduser(config["base"]["root"])
+    imgs_root = expanduser(config["base"]["imgs_root"])
+    do_collate = config["base"]["do_collate"]
     ann_root = expanduser(config["voc_to_coco"]["ann_root"])
     labels = config["voc_to_coco"]["labels"]
     train_frac = config["voc_to_coco"]["train_frac"]
@@ -166,6 +169,45 @@ def main(config):
 
     labels_and_ids = make_ids_from_labels(labels=labels)
     
+    # TODO: MAKE OPTIONAL:
+    # sort xmls and jpgs, then zip add unique ids
+    # COPY to a new dir called collated, a subidr of root
+
+    # This option will flatten the tree for imgs and xmls found in nested directories:
+    if do_collate:
+        
+        collated_dir = join(root, "collated")
+        collated_anns_dir = join(collated_dir, "annotations")
+        os.makedirs(collated_anns_dir)
+        collated_frames_dir = join(collated_dir, "frames")
+        os.makedirs(collated_frames_dir)
+
+        ann_paths = sorted([str(path.absolute()) 
+                            for path in Path(ann_root).rglob("*.xml")])
+        
+        img_exts = [".png", ".jpg", ".tiff"] # TODO: add to README.md
+        frame_paths = sorted([str(path.absolute()) 
+                              for ext in img_exts 
+                              for path in Path(imgs_root).rglob(str("*" + ext)) 
+                              if ext in img_exts])
+
+        assert(len(ann_paths) == len(frame_paths), 
+               "The no. of xml annotations does not equal the no. of original images")
+
+        for i,(xml, frame) in enumerate(zip(ann_paths, frame_paths)):
+            
+            uniq_xml = f"frame_{i:06d}.xml"
+            ext = splitext(frame)[1]
+            uniq_frame = f"frame_{i:06d}{ext}"
+
+            xml_dest = join(collated_anns_dir, uniq_xml)
+            img_dest = join(collated_frames_dir, uniq_frame) 
+
+            shutil.copyfile(xml, xml_dest)
+            shutil.copyfile(frame, img_dest)
+        
+        ann_root = collated_anns_dir # we don't use collated_frames_dir in this script
+
     all_ann_paths = get_ann_paths(ann_root=ann_root)
     train_ann_paths, val_ann_paths, test_ann_paths = split_data(ann_paths=all_ann_paths, 
                                                                 output_dir=jsons_dir, 
@@ -185,6 +227,8 @@ def main(config):
 
     print(f"All .json files have been written to {jsons_dir}")
 
+    if do_collate:
+        print(f"All collated .xml and image files have been written to {collated_dir}")
 
 if __name__ == '__main__':
     main()
