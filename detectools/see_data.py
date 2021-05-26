@@ -1,5 +1,6 @@
 import random
 from os.path import expanduser, join
+from pathlib import Path
 
 import cv2
 from detectron2.utils.visualizer import Visualizer
@@ -23,10 +24,16 @@ def main(config):
     metadata = MetadataCatalog.get("training_data").set(evaluator_type="coco") # TODO: say in docs that I only support coco
 
     # Show images:
+    if number_of_imgs == 0:
+        number_of_imgs = len(datasets)
     for i,d in enumerate(random.sample(datasets, number_of_imgs)):
 
         id = d["image_id"]
         img = cv2.imread(d["file_name"])
+
+        print(d["file_name"])
+        print(d)
+        print("")
 
         visualizer = Visualizer(img[:, :, ::-1], 
                                 metadata=metadata, 
