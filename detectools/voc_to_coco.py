@@ -39,7 +39,9 @@ def get_image_info(ann_root, extract_num_from_imgid=True):
     if path is None:
         filename = ann_root.findtext('filename')
     else:
-        filename = os.path.basename(path)
+        # path = path.replace("Users/hankbook", "home/hank-x299") # fix for me
+        # filename = path
+        filename = path
 
     img_name = os.path.basename(filename)
     img_id = os.path.splitext(img_name)[0]
