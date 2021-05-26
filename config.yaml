@@ -1,33 +1,74 @@
-# For toy data:
+# # For toy data:
+
+# base:
+#   root:  ~/src/voc2coco/sample
+#   imgs_root:  ~/src/voc2coco/JPEGImages # original imgs
+
+# voc_to_coco:
+#   ann_root: ~/src/voc2coco/sample/Annotations
+#   labels: ["RBC", "WBC", "Platelets"]
+#   train_frac: 0.75
+  
+# see_data:
+#   number_of_imgs: 5
+#   scale: 1.0
+
+# # TODO: Just mention this warning in the README: https://github.com/facebookresearch/detectron2/issues/196
+# train_model:
+#   learning_rate: 0.02 # Pick a good learning rate
+#   lr_decay_policy: [] # Each element in this list states the iteration no. at which the LR will decay by a factor of 10. If empty, the LR will not decay.
+#   max_iter: 300 # Max number of iterations
+#   eval_period: 100 # will do an evluation once every this many iters on cfg.DATASETS.TEST
+#   checkpoint_period: 100 # will save the model .pth this many iterations; doesn't make sense for this val to be smaller than eval_period
+#   # TODO: param for BATCH_SIZE_PER_IMAGE?
+
+# eval_model:
+#   scale: 1.0 # TODO: lose this param?
+#   do_show: false
+
+# analyze_vids:
+#   model_pth: 
+#   score_cutoff: 0.8 # should be high for inference on actual videos
+#   vids_root: 
+#   framerate: 
+
+
+# For my data:
 
 base:
-  root:  ~/src/voc2coco/sample
-  imgs_root:  ~/src/voc2coco/JPEGImages # original imgs
+  # root: /home/hank-x299/tmp/test_run
+  # imgs_root: /home/hank-x299/tmp/test_run/extracted_frames
+
+  root:  ~/Dropbox/_mysci/models/detectron2/cashy
+  imgs_root:  ~/Dropbox/_mysci/models/detectron2/cashy/extracted_frames
 
 voc_to_coco:
-  ann_root: ~/src/voc2coco/sample/Annotations
-  labels: ["RBC", "WBC", "Platelets"]
-  train_frac: 0.75
+  ann_root: ~/Dropbox/_mysci/models/detectron2/cashy/labels
+  labels: ["dalotia", "ant"]
+  train_frac: 0.8
+  
+  # ann_root: /home/hank-x299/tmp/test_run/labelled_imgs
+  
   
 see_data:
-  number_of_imgs: 5
+  number_of_imgs: 0 # if 0, will show all training data
   scale: 1.0
 
 # TODO: Just mention this warning in the README: https://github.com/facebookresearch/detectron2/issues/196
 train_model:
   learning_rate: 0.02 # Pick a good learning rate
-  lr_decay_policy: [] # Each element in this list states the iteration no. at which the LR will decay by a factor of 10. If empty, the LR will not decay.
-  max_iter: 300 # Max number of iterations
-  eval_period: 100 # will do an evluation once every this many iters on cfg.DATASETS.TEST
-  checkpoint_period: 100 # will save the model .pth this many iterations; doesn't make sense for this val to be smaller than eval_period
+  lr_decay_policy: [500, 3000] # Each element in this list states the iteration no. at which the LR will decay by a factor of 10. If empty, the LR will not decay.
+  max_iter: 5000 # Max number of iterations
+  eval_period: 250 # will do an evaluation once every this many iters on cfg.DATASETS.TEST
+  checkpoint_period: 250 # will save the model .pth this many iterations; doesn't make sense for this val to be smaller than eval_period
   # TODO: param for BATCH_SIZE_PER_IMAGE?
 
 eval_model:
-  scale: 1.0
+  scale: 1.0 # TODO: lose this param?
   do_show: false
 
-analyze_vids:
-  model_pth: 
-  score_cutoff: 0.8 # should be high for inference on actual videos
-  vids_root: 
-  framerate: 
+# analyze_vids:
+#   model_pth: 
+#   score_cutoff: 0.8 # should be high for inference on actual videos
+#   vids_root: 
+#   framerate: 
