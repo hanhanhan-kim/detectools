@@ -38,17 +38,14 @@
 base:
   # root: /home/hank-x299/tmp/test_run
   # imgs_root: /home/hank-x299/tmp/test_run/extracted_frames
-
   root:  ~/Dropbox/_mysci/models/detectron2/cashy
   imgs_root:  ~/Dropbox/_mysci/models/detectron2/cashy/extracted_frames
 
 voc_to_coco:
+  # ann_root: /home/hank-x299/tmp/test_run/labelled_imgs
   ann_root: ~/Dropbox/_mysci/models/detectron2/cashy/labels
   labels: ["dalotia", "ant"]
   train_frac: 0.8
-  
-  # ann_root: /home/hank-x299/tmp/test_run/labelled_imgs
-  
   
 see_data:
   number_of_imgs: 0 # if 0, will show all training data

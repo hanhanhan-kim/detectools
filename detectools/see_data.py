@@ -31,10 +31,6 @@ def main(config):
         id = d["image_id"]
         img = cv2.imread(d["file_name"])
 
-        print(d["file_name"])
-        print(d)
-        print("")
-
         visualizer = Visualizer(img[:, :, ::-1], 
                                 metadata=metadata, 
                                 scale=scale)

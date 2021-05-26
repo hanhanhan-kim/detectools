@@ -61,8 +61,6 @@ def main(config):
     rando_idxs = np.random.choice(range(len(datasets)), 5, replace=False).tolist()
     for i,d in enumerate(datasets):
 
-        # import ipdb; ipdb.set_trace()
-
         print(f"Predicting on image {i+1} of {len(datasets)} ...", end="\r")
 
         id = d["image_id"]
