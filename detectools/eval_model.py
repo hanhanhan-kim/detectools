@@ -115,4 +115,7 @@ def main(config):
 
     print(f"Finished evaluating all {len(datasets)} images from the test data fraction.")
     print(f"Results are stored in {output_csv}")
-    print(f"5 sample test images are stored in {output_imgs_dir} \n")
+    print(f"5 sample test images are stored in {output_imgs_dir}\n"
+           "Note that the 5 sample test images show all detections with a score greater than 0.01."
+           "This low score cutoff is for evaluation purposes and is intentional. "
+           "You should expect to see many false positive labels.\n")
