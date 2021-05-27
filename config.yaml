@@ -62,7 +62,9 @@ train_model:
 
 eval_model:
   scale: 1.0 # TODO: lose this param?
-  do_show: false
+  do_show: false 
+  # TODO: Make a note about how the predicted images are gonna look bad here
+  # cuz im showing predictions after a SUPER low score cutoff. 
 
 # analyze_vids:
 #   model_pth: 

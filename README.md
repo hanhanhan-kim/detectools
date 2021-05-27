@@ -32,7 +32,7 @@ pip install -e .
 
 ## How to use:
 
-Using `detectools` is simple! From anywehere, type the following in the command line:
+Using `detectools` is simple! From anywhere, type the following in the command line:
 
 ```bash
 detectools
@@ -43,6 +43,8 @@ Doing so will bring up the menu of possible options and commands. To execute a c
 ```bash
 detectools print-config
 ```
+
+#TODO: note about LabelImg and how to use; show file structure, and mention  Dropbox. 
 
 ### The `.yaml` file
 
@@ -58,8 +60,72 @@ For example, if the `.yaml` file you want to use has the path `~/tmp/my_weird_co
 detectools --config ~/tmp/my_weird_config.yaml undistort
 ```
 
-Each key in the `.yaml` configuration file refers to a `detectools` command. The value of each of these keys is a dictionary that specifies the parameters for that `detectools` command. Make sure you do not have any trailing spaces in the `.yaml` file. An example `config.yaml` file is provided in the repository. 
+Each key in the `.yaml` configuration file, except for the `base` key refers to a `detectools` command. The value of each of these keys is a dictionary that specifies the parameters for that `detectools` command. The values of the `base` key are common to a lot of `detectools` commands, and so are factored out. An explanation of the `base` key's values are:
+
+- `root`: 
+- `imgs_root`: 
+
+Make sure you do not have any trailing spaces in the `.yaml` file. An example `config.yaml` file is provided in the repository. 
 
 ### Commands
 
 The outputs of `detectools`' commands never overwrite existing files, without first asking for user confirmation. `detectools`' commands and their respective `.yaml` file arguments are documented below:
+
+#### `print-config`
+
+This command prints the contents of the `.yaml` configuration file. It does not have any `.yaml` parameters.
+
+#### `voc-to-coco`
+
+This command batch converts Pascal VOC-style `.xml` annotation files to  COCO-style `.json` annotation files. It can be used for converting the annotation outputs of [`labelImg`](https://github.com/tzutalin/labelImg) to the required annotation format for [Detectron2](https://github.com/facebookresearch/detectron2).  Its `.yaml` parameters are :
+
+- `ann_root`:
+- `labels`:
+- `train_frac`:
+
+This command returns, in the `root` directory, four `.json` files that specify the images and annotations used for each fraction of the split data. The `train.json` contains information for the training data fraction, the `val.json` contains information for the  evaluation data fraction, the `test.json` contains information for the test data fraction, and the `all.json` contains information for the entire dataset. 
+
+#### ` see-data`
+
+This command .... Its `.yaml` parameters are :
+
+- `number_of_imgs`: 
+- `scale`:
+
+This command returns a ....
+
+#### `train-model`
+
+This command .... Its `.yaml` parameters are :
+
+- `learning_rate`:
+- `lr_decay_policy`:
+- `max_iter`:
+- `eval_period`:
+- `checkpoint_period`:
+
+This command returns a ....
+
+#### `see-tensorboard`
+
+This command displays the [TensorBoard](https://www.tensorflow.org/tensorboard) for the trained model at its latest iteration. It does not have any `.yaml` parameters.
+
+#### `eval-model`
+
+This command .... Its `.yaml` parameters are :
+
+- `scale`:
+- `do_show`:
+
+This command returns a ....
+
+#### `analyze-vids`
+
+This command .... Its `.yaml` parameters are :
+
+- `model_pth`:
+- `score_cutoff`:
+- `vids_root`:
+- `frame_rate`: 
+
+This command returns a ....
