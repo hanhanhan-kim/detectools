@@ -1,5 +1,4 @@
-from os.path import expanduser, join, basename, dirname, splitext
-from os import makedirs
+from os.path import expanduser, join, basename, splitext
 from pathlib import Path
 import csv
 import atexit
@@ -7,7 +6,6 @@ import atexit
 import numpy as np
 import cv2
 from tqdm import trange
-from torch import topk
 from detectron2.engine import DefaultPredictor
 from detectron2.config import CfgNode
 from detectron2.utils.visualizer import ColorMode, Visualizer
@@ -66,6 +64,15 @@ def main(config):
     print("Generating predictor ...")
     predictor = DefaultPredictor(cfg)
 
+    bgr_palette = [(165, 194, 102),
+                   (98, 141, 252),
+                   (203, 160, 141),
+                   (195, 138, 231),
+                   (84, 216, 166),
+                   (47, 217, 255),
+                   (148, 196, 229),
+                   (179, 179, 179)]
+
     for vid in vids:
         
         cap = cv2.VideoCapture(vid)
@@ -122,13 +129,12 @@ def main(config):
                 for i,thing_id in enumerate(thing_ids):
                     idxs_of_each_thing[thing_id].append(i)
 
+                # if thing_class in expected_obj_nums:
+
                 # Split up the data according to thing_id:
-                for i,(thing_id, idxs) in enumerate(idxs_of_each_thing.items()):
+                for i, ((thing_id, idxs), hue) in enumerate(zip(idxs_of_each_thing.items(), bgr_palette)):
 
-                    thing_id = thing_id # lol TODO: rm this
                     thing_class = metadata.thing_classes[thing_id]
-
-                    # TODO: replace with user arg  
                     expected_obj_num = expected_obj_nums[thing_class]               
                     num_boxes = scores.size
 
@@ -151,8 +157,11 @@ def main(config):
                         y2 = int(coords[3])
                         score = float(thing_scores[j])
 
-                        labelled_frame = cv2.rectangle(labelled_frame, (x1, y1), (x2, y2), (0,255,0), 1)
+                        labelled_frame = cv2.rectangle(labelled_frame, (x1, y1), (x2, y2), hue, 2)
+                        labelled_frame = cv2.putText(labelled_frame, thing_class, (x2-10,y2-40), cv2.FONT_HERSHEY_SIMPLEX, 1, hue, 2)
 
+                        # TODO: Write some sort of simple filtering thing that skips
+                        # big jumps ... maybe just store the last bbox coords and compare
                         csv_writer.writerow({col_names[0]: int(f), # frame
                                              col_names[1]: x1, # x1
                                              col_names[2]: y1, # y1
@@ -166,3 +175,5 @@ def main(config):
                 out.write(labelled_frame)
 
                 pbar.set_description(f"Detecting in frame {f+1}/{frame_count}")
+
+                # TODO: Clear GPU memory
