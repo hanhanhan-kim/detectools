@@ -106,12 +106,7 @@ def main(config):
                 #                         instance_mode=ColorMode)
                 # visualizer = visualizer.draw_instance_predictions(detected["instances"].to("cpu"))      
                 # detected_img = visualizer.get_image()[:, :, ::-1]
-                # TODO: Get top score for each animal according to dict
-                # and then save and show those with cv2.rectangle
-                # detected_img = frame 
-
-                # # Save frame to vid:
-                # out.write(detected_img)
+               
                 labelled_frame = frame
 
                 # Save the predicted box coords and scores to a dictionary:
@@ -142,22 +137,19 @@ def main(config):
                         every frame of the video, according to `expected_obj_nums`, \
                         but only {num_boxes} were found in frame {f}."
 
-                    # TODO!!! I'm only labelling one of the objects for some reason ...
+                    thing_scores = scores[idxs]
+                    thing_boxes = boxes[idxs]
 
                     # Here, I grab the top n animals according to their score
                     # because by default, `preds` is sorted by their descending scores:
                     for j in range(0, expected_obj_num):
                                             
-                        coords = boxes[j]
+                        coords = thing_boxes[j]
                         x1 = int(coords[0])
                         y1 = int(coords[1])
                         x2 = int(coords[2])
                         y2 = int(coords[3])
-                        score = float(scores[j])
-
-                        # import ipdb; ipdb.set_trace()
-                        # thing_id = thing_ids[i] # is int
-                        # thing_class = metadata.thing_classes[thing_id]
+                        score = float(thing_scores[j])
 
                         labelled_frame = cv2.rectangle(labelled_frame, (x1, y1), (x2, y2), (0,255,0), 1)
 
