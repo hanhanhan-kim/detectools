@@ -35,7 +35,9 @@ def main(config):
     if not 0 < score_cutoff < 1:
         raise ValueError(f"The testing threshold, {score_cutoff}, must be between 0 and 1.")
 
-    vids = [str(path.absolute()) for path in Path(vids_root).rglob("*.mp4")]
+    vids = [str(path.absolute()) for path in Path(vids_root).rglob("*_undistorted.mp4") if "dal" in str(path.absolute())]
+    # from pprint import pprint; pprint(vids)
+    # import ipdb;ipdb.set_trace()
     if len(vids) == 0:
         print(f"No .mp4 videos were found in {vids_root} ...")
 
@@ -74,6 +76,8 @@ def main(config):
                    (179, 179, 179)]
 
     for vid in vids:
+
+        print(f"Analyzing {vid} ...")
         
         cap = cv2.VideoCapture(vid)
         frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -181,3 +185,6 @@ def main(config):
 
     # Clear GPU memory
     torch.cuda.empty_cache()
+
+    # TODO: Make sure it doesn't rewrite ...
+    # TODO: Print where the csv and labelled videos saved ...

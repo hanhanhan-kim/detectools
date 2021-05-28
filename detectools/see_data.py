@@ -37,6 +37,7 @@ def main(config):
         out = visualizer.draw_dataset_dict(d)
 
         cv2.imshow(f"image {id}", out.get_image()[:, :, ::-1])
+        print(d["file_name"])
         print(f"Press any key to go to the next image ({i+1}/{number_of_imgs}) ...")
 
         key = cv2.waitKey(0) & 0xFF

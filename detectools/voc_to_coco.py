@@ -3,7 +3,7 @@ Modified from https://github.com/yukkyo/voc2coco
 """
 
 import os
-from os.path import basename, expanduser, dirname, join
+from os.path import basename, expanduser, join
 from pathlib import Path
 import json
 import random
@@ -32,7 +32,7 @@ def get_ann_paths(ann_root: str) -> List[str]:
     return ann_paths
 
 
-def get_image_info(ann_root, extract_num_from_imgid=True):
+def get_image_info(ann_root, extract_num_from_imgid=False):
 
     path = ann_root.findtext('path')
 
@@ -42,7 +42,6 @@ def get_image_info(ann_root, extract_num_from_imgid=True):
         # path = path.replace("Users/hankbook", "home/hank-x299") # fix for me
         # filename = path
         filename = path
-
     img_name = os.path.basename(filename)
     img_id = os.path.splitext(img_name)[0]
 
@@ -183,7 +182,7 @@ def main(config):
         convert_xmls_to_cocojson(ann_paths=paths,
                                  labels_and_ids=labels_and_ids,
                                  output_json=output_json,
-                                 extract_num_from_imgid=True)
+                                 extract_num_from_imgid=False) # important that this be false
 
     print(f"All .json files have been written to {jsons_dir}")
 
