@@ -59,7 +59,7 @@ def main(config):
     cfg.MODEL.WEIGHTS = model_pth
     # # Pick a confidence cutoff # TODO: based on PR curve
     # # TODO: don't have this as a user parameter
-    # cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = score_cutoff 
+    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = score_cutoff 
 
     print("Generating predictor ...")
     predictor = DefaultPredictor(cfg)
@@ -163,7 +163,8 @@ def main(config):
 
                             # TODO: Write some sort of simple filtering thing that skips
                             # big jumps ... maybe just store the last bbox coords and compare.
-                            # Define big jumps as a proportion of the frame width or something
+                            # Define big jumps as a proportion of the frame width or average of 
+                            # last few frame deltas
                             csv_writer.writerow({col_names[0]: int(f), # frame
                                                 col_names[1]: x1, # x1
                                                 col_names[2]: y1, # y1

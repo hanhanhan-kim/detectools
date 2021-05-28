@@ -71,6 +71,6 @@ analyze_vids:
   expected_obj_nums: # expected number of each label across the entirety of the video
     dalotia: 1
     ant: 1
-  score_cutoff: 0.8 # should be high for inference on actual videos
+  score_cutoff: 0.9 # should be high for inference on actual videos
   vids_root: ~/tmp/test_run
   framerate: 30
