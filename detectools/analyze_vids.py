@@ -129,47 +129,49 @@ def main(config):
                 for i,thing_id in enumerate(thing_ids):
                     idxs_of_each_thing[thing_id].append(i)
 
-                # if thing_class in expected_obj_nums:
-
                 # Split up the data according to thing_id:
                 for i, ((thing_id, idxs), hue) in enumerate(zip(idxs_of_each_thing.items(), bgr_palette)):
 
                     thing_class = metadata.thing_classes[thing_id]
-                    expected_obj_num = expected_obj_nums[thing_class]               
-                    num_boxes = scores.size
 
-                    assert expected_obj_num <= num_boxes, \
-                        f"You expected {expected_obj_num} {thing_class} in \
-                        every frame of the video, according to `expected_obj_nums`, \
-                        but only {num_boxes} were found in frame {f}."
+                    if thing_class in expected_obj_nums:
 
-                    thing_scores = scores[idxs]
-                    thing_boxes = boxes[idxs]
+                        expected_obj_num = expected_obj_nums[thing_class]               
+                        num_boxes = scores.size
 
-                    # Here, I grab the top n animals according to their score
-                    # because by default, `preds` is sorted by their descending scores:
-                    for j in range(0, expected_obj_num):
-                                            
-                        coords = thing_boxes[j]
-                        x1 = int(coords[0])
-                        y1 = int(coords[1])
-                        x2 = int(coords[2])
-                        y2 = int(coords[3])
-                        score = float(thing_scores[j])
+                        assert expected_obj_num <= num_boxes, \
+                            f"You expected {expected_obj_num} {thing_class} in \
+                            every frame of the video, according to `expected_obj_nums`, \
+                            but only {num_boxes} were found in frame {f}."
 
-                        labelled_frame = cv2.rectangle(labelled_frame, (x1, y1), (x2, y2), hue, 2)
-                        labelled_frame = cv2.putText(labelled_frame, thing_class, (x2-10,y2-40), cv2.FONT_HERSHEY_SIMPLEX, 1, hue, 2)
+                        thing_scores = scores[idxs]
+                        thing_boxes = boxes[idxs]
 
-                        # TODO: Write some sort of simple filtering thing that skips
-                        # big jumps ... maybe just store the last bbox coords and compare
-                        csv_writer.writerow({col_names[0]: int(f), # frame
-                                             col_names[1]: x1, # x1
-                                             col_names[2]: y1, # y1
-                                             col_names[3]: x2, # x2
-                                             col_names[4]: y2, # y2
-                                             col_names[5]: score, # score
-                                             col_names[6]: thing_class, # thing
-                                             col_names[7]: i}) # dummy id
+                        # Here, I grab the top n animals according to their score
+                        # because by default, `preds` is sorted by their descending scores:
+                        for j in range(0, expected_obj_num):
+                                                
+                            coords = thing_boxes[j]
+                            x1 = int(coords[0])
+                            y1 = int(coords[1])
+                            x2 = int(coords[2])
+                            y2 = int(coords[3])
+                            score = float(thing_scores[j])
+
+                            labelled_frame = cv2.rectangle(labelled_frame, (x1, y1), (x2, y2), hue, 2)
+                            labelled_frame = cv2.putText(labelled_frame, thing_class, (x2-10,y2-40), cv2.FONT_HERSHEY_SIMPLEX, 1, hue, 2)
+
+                            # TODO: Write some sort of simple filtering thing that skips
+                            # big jumps ... maybe just store the last bbox coords and compare.
+                            # Define big jumps as a proportion of the frame width or something
+                            csv_writer.writerow({col_names[0]: int(f), # frame
+                                                col_names[1]: x1, # x1
+                                                col_names[2]: y1, # y1
+                                                col_names[3]: x2, # x2
+                                                col_names[4]: y2, # y2
+                                                col_names[5]: score, # score
+                                                col_names[6]: thing_class, # thing
+                                                col_names[7]: i}) # dummy id
 
                 # Save frame to vid:
                 out.write(labelled_frame)
