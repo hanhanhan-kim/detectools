@@ -127,10 +127,10 @@ def main(config):
                 for thing_id in set(thing_ids):
                     idxs_of_each_thing[thing_id] = []
                 for i,thing_id in enumerate(thing_ids):
-                    idxs_of_each_thing[thing_id].append(i)
+                    idxs_of_each_thing[thing_id].append(i) 
 
                 # Split up the data according to thing_id:
-                for i, ((thing_id, idxs), hue) in enumerate(zip(idxs_of_each_thing.items(), bgr_palette)):
+                for i, (thing_id, idxs) in enumerate(idxs_of_each_thing.items()):
 
                     thing_class = metadata.thing_classes[thing_id]
 
@@ -158,8 +158,8 @@ def main(config):
                             y2 = int(coords[3])
                             score = float(thing_scores[j])
 
-                            labelled_frame = cv2.rectangle(labelled_frame, (x1, y1), (x2, y2), hue, 2)
-                            labelled_frame = cv2.putText(labelled_frame, thing_class, (x2-10,y2-40), cv2.FONT_HERSHEY_SIMPLEX, 1, hue, 2)
+                            labelled_frame = cv2.rectangle(labelled_frame, (x1, y1), (x2, y2), bgr_palette[thing_id], 2)
+                            labelled_frame = cv2.putText(labelled_frame, thing_class, (x2-10,y2-40), cv2.FONT_HERSHEY_SIMPLEX, 1, bgr_palette[thing_id], 2)
 
                             # TODO: Write some sort of simple filtering thing that skips
                             # big jumps ... maybe just store the last bbox coords and compare.
