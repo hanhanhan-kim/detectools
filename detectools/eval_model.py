@@ -1,10 +1,10 @@
-import random
 from os.path import expanduser, join, basename
 from os import makedirs
 import csv
 import atexit
 
 import numpy as np
+import torch
 import cv2
 from detectron2.engine import DefaultPredictor
 from detectron2.config import CfgNode
@@ -119,3 +119,6 @@ def main(config):
            "Note that the 5 sample test images show all detections with a score greater than 0.01. "
            "This low score cutoff is for evaluation purposes and is intentional. "
            "You should expect to see many false positive labels.\n")
+
+    # Clear GPU memory
+    torch.cuda.empty_cache()

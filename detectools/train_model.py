@@ -2,6 +2,7 @@ from os import makedirs
 from os.path import expanduser
 from os.path import join 
 
+import torch
 from detectron2 import model_zoo
 from detectron2.config import get_cfg
 # from detectron2.engine import DefaultTrainer # I use my CocoTrainer instead
@@ -78,3 +79,6 @@ def main(config):
 
     print(f"All results are stored in {model_dir}\n")
     # TODO: Say in docs that I only support coco
+
+    # Clear GPU memory
+    torch.cuda.empty_cache()

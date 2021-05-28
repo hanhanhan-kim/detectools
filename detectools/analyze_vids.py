@@ -3,7 +3,7 @@ from pathlib import Path
 import csv
 import atexit
 
-import numpy as np
+import torch
 import cv2
 from tqdm import trange
 from detectron2.engine import DefaultPredictor
@@ -179,4 +179,5 @@ def main(config):
 
                 pbar.set_description(f"Detecting in frame {f+1}/{frame_count}")
 
-                # TODO: Clear GPU memory
+    # Clear GPU memory
+    torch.cuda.empty_cache()
