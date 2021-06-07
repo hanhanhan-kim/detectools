@@ -69,10 +69,10 @@ def see_tensorboard(config):
 
 @cli.command()
 @pass_config
-def eval_model(config):
-    from detectools import eval_model
+def test_model(config):
+    from detectools import test_model
     click.echo("\nEvaluating model ...")
-    eval_model.main(config)
+    test_model.main(config)
 
 @cli.command()
 @pass_config
