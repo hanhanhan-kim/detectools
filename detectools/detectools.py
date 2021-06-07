@@ -71,7 +71,7 @@ def see_tensorboard(config):
 @pass_config
 def test_model(config):
     from detectools import test_model
-    click.echo("\nEvaluating model ...")
+    click.echo("\nTesting model ...")
     test_model.main(config)
 
 @cli.command()
