@@ -21,8 +21,8 @@ def main(config):
     jsons_dir = join(root, "jsons")
     model_dir = join(root, "outputs")
 
-    scale = float(config["eval_model"]["scale"])
-    do_show = config["eval_model"]["do_show"]
+    scale = float(config["test_model"]["scale"])
+    do_show = config["test_model"]["do_show"]
 
     register_data(jsons_dir, imgs_root)
 
@@ -113,11 +113,11 @@ def main(config):
                                  col_names[6]: thing_class, # thing
                                  col_names[7]: i}) # dummy id
 
-    print(f"Finished evaluating all {len(datasets)} images from the test data fraction.")
+    print(f"Finished predicting on all {len(datasets)} images from the test data fraction.")
     print(f"Results are stored in {output_csv}")
     print(f"5 sample test images are stored in {output_imgs_dir}\n"
            "Note that the 5 sample test images show all detections with a score greater than 0.01. "
-           "This low score cutoff is for evaluation purposes and is intentional. "
+           "This low score cutoff is for test purposes and is intentional. "
            "You should expect to see many false positive labels.\n")
 
     # Clear GPU memory
