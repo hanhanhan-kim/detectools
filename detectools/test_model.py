@@ -37,7 +37,7 @@ def main(config):
     cfg = CfgNode.load_cfg(cfg) 
 
     # Use the weights from the model trained on our custom dataset:
-    cfg.MODEL.WEIGHTS = join(model_dir, "model_final.pth")
+    cfg.MODEL.WEIGHTS = join(model_dir, "model_final.pth") # TODO: have option to use snapshot instead
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.01 # make small so I can make PR curve for broad range of scores
     # cfg.DATASETS.TEST = ("val_data", ) # should already be saved from train_model.py
 
