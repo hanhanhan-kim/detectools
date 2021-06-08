@@ -114,9 +114,16 @@ The outputs of `detectools`' commands never overwrite existing files, without fi
 
 #### `print-config`
 
+<details><summary> Click for details. </summary>
+<br>
+
 This command prints the contents of the `.yaml` configuration file. It does not have any `.yaml` parameters.
+</details>
 
 #### `voc-to-coco`
+
+<details><summary> Click for details. </summary>
+<br>
 
 This command batch converts Pascal VOC-style `.xml` annotation files to  COCO-style `.json` annotation files. It can be used for converting the annotation outputs of [`labelImg`](https://github.com/tzutalin/labelImg) to the required annotation format for [Detectron2](https://github.com/facebookresearch/detectron2).  Its `.yaml` parameters are :
 
@@ -125,8 +132,12 @@ This command batch converts Pascal VOC-style `.xml` annotation files to  COCO-st
 - `train_frac` (float): The fraction of the labeled data to be used for training the model. The remaining data is evenly split between the evaluation and test fractions. 
 
 This command returns, in the `root` directory, four `.json` files that specify the images and annotations used for each fraction of the split data. The `train.json` contains information for the training data fraction, the `val.json` contains information for the  evaluation data fraction, the `test.json` contains information for the test data fraction, and the `all.json` contains information for the entire dataset. 
+</details>
 
 #### ` see-data`
+
+<details><summary> Click for details. </summary>
+<br>
 
 This command shows the labeled images in the training data fraction. Its `.yaml` parameters are:
 
@@ -134,8 +145,12 @@ This command shows the labeled images in the training data fraction. Its `.yaml`
 - `scale` (float): The factor by which to scale the displayed image. A scale of `1.0` will display the true size of the image. 
 
 This command returns nothing. It just shows a random sample of labeled images from the training data. 
+</details>
 
 #### `train-model`
+
+<details><summary> Click for details. </summary>
+<br>
 
 This command trains the [**Faster R-CNN**](https://arxiv.org/abs/1506.01497) Detectron2 model. It does not support other object detection algorithms that are supported in Detectron2, such as Mask R-CNN and RetinaNet. Its `.yaml` parameters are : 
 
@@ -148,12 +163,20 @@ This command trains the [**Faster R-CNN**](https://arxiv.org/abs/1506.01497) Det
 This command returns a trained model in the  `outputs` subdirectory of the `root` directory. Recall that the path to the `root` directory was specified under the `base` key of the `config.yaml` file. The final trained model is saved in `outputs` as `model_final.pth`. Model snapshots from previous checkpoints are titled appropriately, and are also `.pth` files in `outputs`. Evaluation results are saved in the `inference` subdirectory of `outputs`.  
 
 *N.B.* During training, a warning about skipped parameter values due to incorrect array shapes will likely appear. This warning is expected behaviour, and can be ignored. It arises because most custom datasets will have a different number of object types from the pre-trained Detectron2 model. See [here](https://github.com/facebookresearch/detectron2/issues/196) for details.
+</details>
 
 #### `see-tensorboard`
 
+<details><summary> Click for details. </summary>
+<br>
+
 This command displays the [TensorBoard](https://www.tensorflow.org/tensorboard) for the trained model at its latest iteration. It does not have any `.yaml` parameters.
+</details>
 
 #### `test-model`
+
+<details><summary> Click for details. </summary>
+<br>
 
 This command uses the trained model to predict labels on the data's test fraction. Its `.yaml` parameters are :
 
@@ -161,8 +184,12 @@ This command uses the trained model to predict labels on the data's test fractio
 - `do_show` (boolean): If true, will display a randomly drawn image with predicted labels, five times. 
 
 This command returns five randomly drawn images with predicted labels from the test fraction, and saves the images in the  `test_pred_imgs` subdirectory of the `outputs` directory. It also returns a `all_test_preds.csv` file which contains the predicted labels for all images from the test fraction. 
+</details>
 
 #### `analyze-vids`
+
+<details><summary> Click for details. </summary>
+<br>
 
 This command uses the trained model to predict labels on a directory of target videos. ***It assumes that a constant number of each object type is present in each video frame***. This assumption is valid for most animal behaviour experiments that take place in an arena. This command's `.yaml` parameters are :
 
@@ -173,3 +200,4 @@ This command uses the trained model to predict labels on a directory of target v
 - `vid_ending` (string): The file ending of the videos to be analyzed. Videos without the specified file ending will be skipped. For example, `.mp4` or `_undistorted.mp4`.
 
 This command returns labeled videos, as well as corresponding `.csv` files. These files are suffixed with either `_detected.mp4` or `_detected.csv`. 
+</details>
