@@ -130,7 +130,7 @@ This command returns, in the `root` directory, four `.json` files that specify t
 
 This command shows the labeled images in the training data fraction. Its `.yaml` parameters are:
 
-- `number_of_imgs` (integer): The number of randomly sampled images to show. 
+- `number_of_imgs` (integer): The number of randomly sampled images to show. If `0`, will display all images. 
 - `scale` (float): The factor by which to scale the displayed image. A scale of `1.0` will display the true size of the image. 
 
 This command returns nothing. It just shows a random sample of labeled images from the training data. 
@@ -139,34 +139,37 @@ This command returns nothing. It just shows a random sample of labeled images fr
 
 This command trains the [**Faster R-CNN**](https://arxiv.org/abs/1506.01497) Detectron2 model. It does not support other object detection algorithms that are supported in Detectron2, such as Mask R-CNN and RetinaNet. Its `.yaml` parameters are : 
 
-- `learning_rate` (float): The model's initial [learning rate](https://en.wikipedia.org/wiki/Learning_rate), i.e. the hyperparameter that determines the degree to which to adjust the model in response to the estimated error. A reasonable default value is 0.2. 
-- `lr_decay_policy` (list of integers): 
-- `max_iter` (integer):
-- `eval_period` (integer):
-- `checkpoint_period` (integer): 
+- `learning_rate` (float): The model's initial [learning rate](https://en.wikipedia.org/wiki/Learning_rate), i.e. the hyperparameter that determines the degree to which to adjust the model, in response to the estimated error. A reasonable default value is 0.2. 
+- `lr_decay_policy` (list of integers): The model's learning rate decay schedule. Each element in the list specifies the iteration number at which the learning rate decays by a factor of 10. For example, if `[500, 3000]`, the learning rate will decrease by an order of magnitude at iteration 500, and will decrease by another order of magnitude at iteration 3000. If the list is empty, the learning rate will not decay. 
+- `max_iter` (integer): The maximum number of iterations for which to train the model. 
+- `eval_period` (integer): The period with which to evaluate the model, *during training*. For example, if set to `250`, the model will be evaluated every 250 iterations, during training. 
+- `checkpoint_period` (integer): The period with which to save a snapshot of the model, as a `.pth` file. For example, if set to `250`, a snapshot of the model-in-training will be saved every 250 iterations. 
 
-This command returns a ....
+This command returns a trained model in the  `outputs` subdirectory of the `root` directory. Recall that the path to the `root` directory was specified under the `base` key of the `config.yaml` file. The final trained model is saved in `outputs` as `model_final.pth`. Model snapshots from previous checkpoints are titled appropriately, and are also `.pth` files in `outputs`. Evaluation results are saved in the `inference` subdirectory of `outputs`.  
+
+*N.B.* During training, a warning about skipped parameter values due to incorrect array shapes will likely appear. This warning is expected behaviour, and can be ignored. It arises because most custom datasets will have a different number of object types from the pre-trained Detectron2 model. See [here](https://github.com/facebookresearch/detectron2/issues/196) for details.
 
 #### `see-tensorboard`
 
 This command displays the [TensorBoard](https://www.tensorflow.org/tensorboard) for the trained model at its latest iteration. It does not have any `.yaml` parameters.
 
-#### `eval-model`
+#### `test-model`
 
-This command .... Its `.yaml` parameters are :
+This command uses the trained model to predict labels on the data's test fraction. Its `.yaml` parameters are :
 
-- `scale`:
-- `do_show`:
+- `scale` (float): The factory by which to scale the displayed image. A scale of `1.0` will display all images. 
+- `do_show` (boolean): If true, will display a randomly drawn image with predicted labels, five times. 
 
-This command returns a ....
+This command returns five randomly drawn images with predicted labels from the test fraction, and saves the images in the  `test_pred_imgs` subdirectory of the `outputs` directory. It also returns a `all_test_preds.csv` file which contains the predicted labels for all images from the test fraction. 
 
 #### `analyze-vids`
 
-This command .... Its `.yaml` parameters are :
+This command uses the trained model to predict labels on a directory of target videos. ***It assumes that a constant number of each object type is present in each video frame***. This assumption is valid for most animal behaviour experiments that take place in an arena. This command's `.yaml` parameters are :
 
-- `model_pth`:
-- `score_cutoff`:
-- `vids_root`:
-- `frame_rate`: 
+- `model_pth` (string): Path to the model `.pth` file.
+- `expected_obj_nums` (dictionary): The number of objects we should expect for every video frame of every video. The keys represent the labels, i.e. object types, and the values represent the number of expected objects. For example, `{beetle: 1, ant: 1}` means that we assume that there's exactly 1 beetle and 1 ant for every frame of every video. 
+- `vids_root` (string): The path to the root directory that houses all the videos to be analyzed. 
+- `frame_rate` (integer): The framerate of the videos, in Hz. 
+- `vid_ending` (string): The file ending of the videos to be analyzed. Videos without the specified file ending will be skipped. For example, `.mp4` or `_undistorted.mp4`.
 
-This command returns a ....
+This command returns labeled videos, as well as corresponding `.csv` files. These files are suffixed with either `_detected.mp4` or `_detected.csv`. 

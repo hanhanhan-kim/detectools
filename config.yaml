@@ -13,7 +13,6 @@
 #   number_of_imgs: 5
 #   scale: 1.0
 
-# # TODO: Just mention this warning in the README: https://github.com/facebookresearch/detectron2/issues/196
 # train_model:
 #   learning_rate: 0.02 # Pick a good learning rate
 #   lr_decay_policy: [] # Each element in this list states the iteration no. at which the LR will decay by a factor of 10. If empty, the LR will not decay.
@@ -22,7 +21,7 @@
 #   checkpoint_period: 100 # will save the model .pth this many iterations; doesn't make sense for this val to be smaller than eval_period
 #   # TODO: param for BATCH_SIZE_PER_IMAGE?
 
-# eval_model:
+# test_model:
 #   scale: 1.0 # TODO: lose this param?
 #   do_show: false
 
@@ -51,7 +50,6 @@ see_data:
   number_of_imgs: 0 # if 0, will show all training data
   scale: 1.0
 
-# TODO: Just mention this warning in the README: https://github.com/facebookresearch/detectron2/issues/196
 train_model:
   learning_rate: 0.02 # Pick a good learning rate
   lr_decay_policy: [500, 3000] # Each element in this list states the iteration no. at which the LR will decay by a factor of 10. If empty, the LR will not decay.
@@ -60,19 +58,19 @@ train_model:
   checkpoint_period: 250 # will save the model .pth this many iterations; doesn't make sense for this val to be smaller than eval_period
   # TODO: param for BATCH_SIZE_PER_IMAGE?
 
-eval_model:
+test_model:
   scale: 1.0 # TODO: lose this param?
   do_show: false 
   # TODO: Make a note about how the predicted images are gonna look bad here
   # cuz im showing predictions after a SUPER low score cutoff. 
 
 # TODO: Call this analyze_arena_vids and use it only for arena situations?
+# TODO: Prevent overwriting files ... 
 analyze_vids:
   model_pth: ~/Dropbox/_mysci/models/detectron2/cashy/outputs/model_final.pth
-  expected_obj_nums: # expected number of each label across the entirety of the video
-    dalotia: 1
-    # ant: 1
-  score_cutoff: 0.95 # should be high for inference on actual videos
-  vids_root: /mnt/2TB/data_in/cashylinidae/tests
+  expected_obj_nums: {dalotia: 1, ant: 1} # expected number of each label across the entirety of the video
+  score_cutoff: 0.8 # should be high for inference on actual videos; get rid of this?
+  vids_root: /mnt/2TB/data_in/cashylinidae/tests # TODO: support single file conversions
   framerate: 30
-  # TODO: rglob param? e.g. *_undistorted.mp4
+  # TODO: rglob param? e.g. *_undistorted.mp4; implement this
+  vid_ending: _undistorted.mp4 # assert that it must end with .mp4 TODO implement!
