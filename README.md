@@ -194,10 +194,10 @@ This command returns five randomly drawn images with predicted labels from the t
 This command uses the trained model to predict labels on a directory of target videos. ***It assumes that a constant number of each object type is present in each video frame***. This assumption is valid for most animal behaviour experiments that take place in an arena. This command's `.yaml` parameters are :
 
 - `model_pth` (string): Path to the model `.pth` file.
+- `vid_ending` (string): The file ending of the videos to be analyzed. Videos without the specified file ending will be skipped. For example, `.mp4` or `_undistorted.mp4`. This command supports only `.mp4` video files. 
 - `expected_obj_nums` (dictionary): The number of objects we should expect for every video frame of every video. The keys represent the labels, i.e. object types, and the values represent the number of expected objects. For example, `{beetle: 1, ant: 1}` means that we assume that there's exactly 1 beetle and 1 ant for every frame of every video. 
 - `vids_root` (string): The path to the root directory that houses all the videos to be analyzed. 
 - `frame_rate` (integer): The framerate of the videos, in Hz. 
-- `vid_ending` (string): The file ending of the videos to be analyzed. Videos without the specified file ending will be skipped. For example, `.mp4` or `_undistorted.mp4`.
 
 This command returns labeled videos, as well as corresponding `.csv` files. These files are suffixed with either `_detected.mp4` or `_detected.csv`. 
 </details>

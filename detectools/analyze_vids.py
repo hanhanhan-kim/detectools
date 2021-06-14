@@ -22,6 +22,7 @@ def main(config):
     model_dir = join(root, "outputs")
 
     model_pth = expanduser(config["analyze_vids"]["model_pth"])
+    vid_ending = '*' + config["analyze_vids"]["vid_ending"]
     expected_obj_nums = config["analyze_vids"]["expected_obj_nums"]
     score_cutoff = float(config["analyze_vids"]["score_cutoff"])
     vids_root = expanduser(config["analyze_vids"]["vids_root"])
@@ -29,13 +30,15 @@ def main(config):
 
     if not model_pth.endswith(".pth"):
         raise ValueError(f"{basename(model_pth)} must be a '.pth' file.")
+    if not vid_ending.endswith(".mp4"):
+        raise ValueError(f"{vid_ending} must end in '.mp4'")
     # if model_pth not in model_dir:
     #     raise IOError(f"The selected model, {basename(model_pth)}, is not in "
     #                   f"{basename(model_dir)}. Please pick a model that resides")
     if not 0 < score_cutoff < 1:
         raise ValueError(f"The testing threshold, {score_cutoff}, must be between 0 and 1.")
 
-    vids = [str(path.absolute()) for path in Path(vids_root).rglob("*_undistorted.mp4") if "dal" in str(path.absolute())]
+    vids = [str(path.absolute()) for path in Path(vids_root).rglob("vid_ending")]
     # from pprint import pprint; pprint(vids)
     # import ipdb;ipdb.set_trace()
     if len(vids) == 0:
