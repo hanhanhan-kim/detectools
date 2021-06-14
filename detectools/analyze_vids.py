@@ -38,7 +38,7 @@ def main(config):
     if not 0 < score_cutoff < 1:
         raise ValueError(f"The testing threshold, {score_cutoff}, must be between 0 and 1.")
 
-    vids = [str(path.absolute()) for path in Path(vids_root).rglob("vid_ending")]
+    vids = [str(path.absolute()) for path in Path(vids_root).rglob(vid_ending)]
     # from pprint import pprint; pprint(vids)
     # import ipdb;ipdb.set_trace()
     if len(vids) == 0:

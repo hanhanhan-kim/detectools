@@ -74,4 +74,3 @@ analyze_vids:
   vids_root: ~/tmp/test_run/
   # vids_root: /mnt/2TB/data_in/cashylinidae/tests # TODO: support single file conversions
   framerate: 30
-  # TODO: rglob param? e.g. *_undistorted.mp4; implement this
