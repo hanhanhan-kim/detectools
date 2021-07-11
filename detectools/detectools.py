@@ -57,6 +57,8 @@ def see_data(config):
 def train_model(config):
     from detectools import train_model
     click.echo("\nTraining model ...")
+    click.echo("Run this command with the tee command to save the terminal output. \
+               E.g. `detectools train-model|tee my_file.txt")
     train_model.main(config)
 
 @cli.command()
